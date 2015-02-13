@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -19,7 +19,7 @@ public class BadgesFragment extends Fragment {
 
     private Player player;
 
-    private PredicateLayout badgesLayout;
+    private LinearLayout badgesLayout;
 
     public BadgesFragment() {
         // Required empty public constructor
@@ -40,7 +40,7 @@ public class BadgesFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        badgesLayout = (PredicateLayout) getActivity().findViewById(R.id.badges_layout);
+        badgesLayout = (LinearLayout) getActivity().findViewById(R.id.badges_layout);
 
         try {
             String steamid = "76561198012101080";
@@ -53,8 +53,10 @@ public class BadgesFragment extends Fragment {
                 player.setSteamId(steamid);
                 playerDao.create(player);
 
-                player = playerDao.queryForEq("steamId", steamid).get(0);
+                playerResult = playerDao.queryForEq("steamId", steamid);
             }
+
+            player = playerResult.get(0);
         } catch (Exception ex) {
             ex.printStackTrace(System.out);
         }
@@ -91,7 +93,6 @@ public class BadgesFragment extends Fragment {
             @Override
             public void process() {
                 try {
-                    Dao<PlayerBadge, Long> playerBadgeDao = DaoManager.createDao(DbOpenHelper.getCon(), PlayerBadge.class);
                     Dao<Badge, Long> badgeDao = DaoManager.createDao(DbOpenHelper.getCon(), Badge.class);
 
                     Collection<PlayerBadge> playerBadges = player.getPlayerBadges();
@@ -102,21 +103,30 @@ public class BadgesFragment extends Fragment {
                         badgeCount++;
 
                         if (badge == null) {
-                            this.dialog.setMessage("Loading Badge " + badgeCount + "/" + playerBadges.size());
+                            this.doUpdate(badgeCount, playerBadges.size());
 
-                            badge = Util.loadBadgeData(playerBadge.getAppId(), playerBadge.getBadgeId(), playerBadge.getLevel());
-                            badgeDao.create(badge);
+                            try {
+                                badge = Util.loadBadgeData(playerBadge.getAppId(), playerBadge.getBadgeId(), playerBadge.getLevel());
+                                badgeDao.create(badge);
 
-                            playerBadge.setBadge(badge);
-                            playerBadgeDao.update(playerBadge);
+                                playerBadge.setBadge(badge);
+                                player.getPlayerBadges().update(playerBadge);
 
-                            Bitmap bitmap = Util.getRemoteImage(badge.getImageUrl());
-                            Util.saveLocalBadgeImage(getActivity(), badge, bitmap);
+                                Bitmap bitmap = Util.getRemoteImage(badge.getImageUrl());
+                                Util.saveLocalBadgeImage(getActivity(), badge, bitmap);
+                            } catch (Exception ex) {
+                                ex.printStackTrace(System.out);
+                            }
                         }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace(System.out);
                 }
+            }
+
+            @Override
+            public void onUpdate(Object... values) {
+                this.dialog.setMessage("Loading Badge " + values[0] + "/" + values[1]);
             }
 
             @Override
@@ -126,8 +136,14 @@ public class BadgesFragment extends Fragment {
                 for (PlayerBadge playerBadge : playerBadges) {
                     Badge badge = playerBadge.getBadge();
 
+                    if (badge == null) {
+                        continue;
+                    }
+
                     ImageView badgeView = new ImageView(getContext());
-                    badgeView.setImageBitmap(Util.openLocalBadgeImage(getContext(), badge));
+                    badgeView.setLayoutParams(new LinearLayout.LayoutParams(Util.dpsToPixels(getContext(), 70), Util.dpsToPixels(getContext(), 70)));
+                    badgeView.setImageBitmap(Util.openLocalBadgeImage(getContext(), playerBadge));
+                    badgeView.setScaleType(ImageView.ScaleType.FIT_XY);
 
                     badgesLayout.addView(badgeView);
                 }

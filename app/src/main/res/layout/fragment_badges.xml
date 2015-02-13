@@ -2,10 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="com.x7.steambadger.BadgesFragment">
 
-    <com.x7.steambadger.PredicateLayout
-        android:id="@+id/badges_layout"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.x7.steambadger.PredicateLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/badges_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAlignment="center"/>
+    </ScrollView>
 
 </FrameLayout>

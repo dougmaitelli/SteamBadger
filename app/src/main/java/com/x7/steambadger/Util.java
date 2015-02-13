@@ -23,6 +23,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,17 +75,18 @@ public class Util {
                 }
 
                 PlayerBadge playerBadge = new PlayerBadge();
+                playerBadge.setPlayer(player);
                 playerBadge.setAppId(badgeQuery.getAppId());
                 playerBadge.setBadgeId(badgeQuery.getBadgeId());
                 playerBadge.setLevel(badgeQuery.getLevel());
                 playerBadge.setBadge(badge);
                 playerBadgeDao.create(playerBadge);
 
-                player.getPlayerBadges().add(playerBadge);
+                //player.getPlayerBadges().add(playerBadge);
             }
 
             player.setBadgesLoaded(true);
-            playerDao.create(player);
+            playerDao.update(player);
         } catch (JSONException | IOException ex) {
             throw ex;
         }
@@ -111,7 +113,7 @@ public class Util {
         Elements badgeContainers = doc.select(".showcase-element-container.badge");
         Element badgeContainer = badgeContainers.get(badgeid - 1);
 
-        Elements showcaseElements = badgeContainer.getAllElements();
+        Elements showcaseElements = badgeContainer.children();
 
         for (Element showcaseElement : showcaseElements) {
             if (!showcaseElement.hasText()) {
@@ -176,7 +178,7 @@ public class Util {
         FileOutputStream outputStream;
 
         try {
-            outputStream = context.openFileOutput(context.getFilesDir() + "/badges/" + badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png", Context.MODE_PRIVATE);
+            outputStream = context.openFileOutput(badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png", Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
             outputStream.close();
         } catch (Exception e) {
@@ -194,14 +196,26 @@ public class Util {
         return null;
     }
 
-    public static Bitmap openLocalBadgeImage(Context context, Badge badge) {
-        File imgFile = new  File(context.getFilesDir() + "/badges/" + badge.getAppId()+ "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png");
+    public static Bitmap openLocalBadgeImage(Context context, PlayerBadge badge) {
+        FileInputStream inputStream;
 
-        if(imgFile.exists()){
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+        try {
+            inputStream = context.openFileInput(badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png");
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+
+            return bitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return null;
+    }
+
+    public static int dpsToPixels(Context context, int dps) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        int pixels = (int) (dps * scale + 0.5f);
+        return pixels;
     }
 
 }
