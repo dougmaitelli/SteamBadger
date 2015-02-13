@@ -1,13 +1,12 @@
 package com.x7.steambadger;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.j256.ormlite.dao.Dao;
@@ -103,7 +102,7 @@ public class BadgesFragment extends Fragment {
                         badgeCount++;
 
                         if (badge == null) {
-                            Toast.makeText(getActivity(), badgeCount + "/" + playerBadges.size(), Toast.LENGTH_SHORT).show();
+                            this.dialog.setMessage("Loading Badge " + badgeCount + "/" + playerBadges.size());
 
                             badge = Util.loadBadgeData(playerBadge.getAppId(), playerBadge.getBadgeId(), playerBadge.getLevel());
                             badgeDao.create(badge);
@@ -112,7 +111,7 @@ public class BadgesFragment extends Fragment {
                             playerBadgeDao.update(playerBadge);
 
                             Bitmap bitmap = Util.getRemoteImage(badge.getImageUrl());
-                            Util.saveLocalImage(getActivity(), "badges/" + badge.getAppId() + "_" + badge.getLevel() + ".png", bitmap);
+                            Util.saveLocalBadgeImage(getActivity(), badge, bitmap);
                         }
                     }
                 } catch (Exception ex) {
@@ -127,12 +126,10 @@ public class BadgesFragment extends Fragment {
                 for (PlayerBadge playerBadge : playerBadges) {
                     Badge badge = playerBadge.getBadge();
 
-                    TextView t = new TextView(getContext());
-                    t.setText(badge.getText());
-                    t.setBackgroundColor(Color.RED);
-                    t.setSingleLine(true);
+                    ImageView badgeView = new ImageView(getContext());
+                    badgeView.setImageBitmap(Util.openLocalBadgeImage(getContext(), badge));
 
-                    badgesLayout.addView(t);
+                    badgesLayout.addView(badgeView);
                 }
             }
         };

@@ -22,6 +22,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -163,12 +164,44 @@ public class Util {
         FileOutputStream outputStream;
 
         try {
-            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream = context.openFileOutput(context.getFilesDir() + filename, Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
             outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void saveLocalBadgeImage(Context context, Badge badge, Bitmap bitmap) {
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = context.openFileOutput(context.getFilesDir() + "/badges/" + badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png", Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Bitmap openLocalImage(Context context, String filename) {
+        File imgFile = new  File(context.getFilesDir() + filename);
+
+        if(imgFile.exists()){
+            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+        }
+
+        return null;
+    }
+
+    public static Bitmap openLocalBadgeImage(Context context, Badge badge) {
+        File imgFile = new  File(context.getFilesDir() + "/badges/" + badge.getAppId()+ "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png");
+
+        if(imgFile.exists()){
+            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+        }
+
+        return null;
     }
 
 }
