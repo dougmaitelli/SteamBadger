@@ -1,4 +1,4 @@
-package com.x7.steambadger;
+package com.x7.steambadger.database.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -16,7 +16,7 @@ public class PlayerBadge {
     private int badgeId;
     @DatabaseField
     private int level;
-    @DatabaseField(foreign = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Badge badge;
 
     public Long getId() {

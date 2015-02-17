@@ -4,13 +4,23 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.ForeignCollection;
+import com.x7.steambadger.database.DbOpenHelper;
+import com.x7.steambadger.database.model.Badge;
+import com.x7.steambadger.database.model.Player;
+import com.x7.steambadger.database.model.PlayerBadge;
+import com.x7.steambadger.util.LoaderTask;
+import com.x7.steambadger.view.BadgeView;
+import com.x7.steambadger.view.FlowLayout;
+import com.x7.steambadger.ws.Util;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +29,7 @@ public class BadgesFragment extends Fragment {
 
     private Player player;
 
-    private LinearLayout badgesLayout;
+    private FlowLayout badgesLayout;
 
     public BadgesFragment() {
         // Required empty public constructor
@@ -40,7 +50,9 @@ public class BadgesFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        badgesLayout = (LinearLayout) getActivity().findViewById(R.id.badges_layout);
+        setHasOptionsMenu(true);
+
+        badgesLayout = (FlowLayout) getActivity().findViewById(R.id.badges_layout);
 
         try {
             String steamid = "76561198012101080";
@@ -66,6 +78,25 @@ public class BadgesFragment extends Fragment {
         } else {
             loadPlayerBadges();
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.badges_fragment_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                loadPlayerBadges();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+        return true;
     }
 
     private void loadPlayerBadges() {
@@ -95,22 +126,22 @@ public class BadgesFragment extends Fragment {
                 try {
                     Dao<Badge, Long> badgeDao = DaoManager.createDao(DbOpenHelper.getCon(), Badge.class);
 
-                    Collection<PlayerBadge> playerBadges = player.getPlayerBadges();
+                    ForeignCollection<PlayerBadge> playerBadges = player.getPlayerBadges();
 
                     int badgeCount = 0;
                     for (PlayerBadge playerBadge : playerBadges) {
                         Badge badge = playerBadge.getBadge();
                         badgeCount++;
 
-                        if (badge == null) {
-                            this.doUpdate(badgeCount, playerBadges.size());
+                        this.doUpdate(badgeCount, playerBadges.size());
 
+                        if (badge == null) {
                             try {
                                 badge = Util.loadBadgeData(playerBadge.getAppId(), playerBadge.getBadgeId(), playerBadge.getLevel());
                                 badgeDao.create(badge);
 
                                 playerBadge.setBadge(badge);
-                                player.getPlayerBadges().update(playerBadge);
+                                playerBadges.update(playerBadge);
 
                                 Bitmap bitmap = Util.getRemoteImage(badge.getImageUrl());
                                 Util.saveLocalBadgeImage(getActivity(), badge, bitmap);
@@ -131,6 +162,8 @@ public class BadgesFragment extends Fragment {
 
             @Override
             public void onComplete() {
+                badgesLayout.removeAllViews();
+
                 Collection<PlayerBadge> playerBadges = player.getPlayerBadges();
 
                 for (PlayerBadge playerBadge : playerBadges) {
@@ -140,11 +173,7 @@ public class BadgesFragment extends Fragment {
                         continue;
                     }
 
-                    ImageView badgeView = new ImageView(getContext());
-                    badgeView.setLayoutParams(new LinearLayout.LayoutParams(Util.dpsToPixels(getContext(), 70), Util.dpsToPixels(getContext(), 70)));
-                    badgeView.setImageBitmap(Util.openLocalBadgeImage(getContext(), playerBadge));
-                    badgeView.setScaleType(ImageView.ScaleType.FIT_XY);
-
+                    BadgeView badgeView = new BadgeView(getContext(), badge);
                     badgesLayout.addView(badgeView);
                 }
             }

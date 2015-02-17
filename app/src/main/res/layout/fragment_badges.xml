@@ -6,12 +6,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:orientation="vertical"
+        <com.x7.steambadger.view.FlowLayout
             android:id="@+id/badges_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:textAlignment="center"/>
+            android:padding="5dp"/>
     </ScrollView>
 
 </FrameLayout>

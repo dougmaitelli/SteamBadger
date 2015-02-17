@@ -8,6 +8,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.x7.steambadger.database.DbOpenHelper;
+import com.x7.steambadger.database.model.Player;
+
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 

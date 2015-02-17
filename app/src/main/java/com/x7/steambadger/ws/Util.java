@@ -1,4 +1,4 @@
-package com.x7.steambadger;
+package com.x7.steambadger.ws;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,6 +6,11 @@ import android.graphics.BitmapFactory;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.x7.steambadger.database.DbOpenHelper;
+import com.x7.steambadger.database.model.Badge;
+import com.x7.steambadger.database.model.Player;
+import com.x7.steambadger.database.model.PlayerBadge;
+import com.x7.steambadger.ws.conn.DataLoader;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -15,14 +20,12 @@ import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -43,53 +46,51 @@ public class Util {
 
     public static void getPlayerBadges(Player player) throws Exception {
         Dao<Player, Long> playerDao = DaoManager.createDao(DbOpenHelper.getCon(), Player.class);
+        Dao<PlayerBadge, Long> playerBadgeDao = DaoManager.createDao(DbOpenHelper.getCon(), PlayerBadge.class);
+        Dao<Badge, Long> badgeDao = DaoManager.createDao(DbOpenHelper.getCon(), Badge.class);
+
+        for (PlayerBadge playerBadge : player.getPlayerBadges()) {
+            playerBadgeDao.delete(playerBadge);
+        }
+
 
         HashMap<String, String> values = new HashMap<>();
         values.put("steamid", player.getSteamId().toString());
 
-        try {
-            JSONObject object = sendRequest("IPlayerService/GetBadges/v1/", values).getJSONObject("response");
+        JSONObject object = sendRequest("IPlayerService/GetBadges/v1/", values).getJSONObject("response");
 
-            JSONArray badgesArray = object.getJSONArray("badges");
+        JSONArray badgesArray = object.getJSONArray("badges");
 
-            Dao<PlayerBadge, Long> playerBadgeDao = DaoManager.createDao(DbOpenHelper.getCon(), PlayerBadge.class);
-            Dao<Badge, Long> badgeDao = DaoManager.createDao(DbOpenHelper.getCon(), Badge.class);
+        for (int i = 0; i < badgesArray.length(); i++) {
+            JSONObject badgeObject = badgesArray.getJSONObject(i);
 
-            for (int i = 0; i < badgesArray.length(); i++) {
-                JSONObject badgeObject = badgesArray.getJSONObject(i);
-
-                if (!badgeObject.has("appid")) {
-                    continue;
-                }
-
-                Badge badgeQuery = new Badge();
-                badgeQuery.setAppId(badgeObject.getString("appid"));
-                badgeQuery.setBadgeId(badgeObject.getInt("badgeid"));
-                badgeQuery.setLevel(badgeObject.getInt("level"));
-
-                List<Badge> badgesResult = badgeDao.queryForMatchingArgs(badgeQuery);
-
-                Badge badge = null;
-                if (badgesResult.size() > 0) {
-                    badge = badgesResult.get(0);
-                }
-
-                PlayerBadge playerBadge = new PlayerBadge();
-                playerBadge.setPlayer(player);
-                playerBadge.setAppId(badgeQuery.getAppId());
-                playerBadge.setBadgeId(badgeQuery.getBadgeId());
-                playerBadge.setLevel(badgeQuery.getLevel());
-                playerBadge.setBadge(badge);
-                playerBadgeDao.create(playerBadge);
-
-                //player.getPlayerBadges().add(playerBadge);
+            if (!badgeObject.has("appid")) {
+                continue;
             }
 
-            player.setBadgesLoaded(true);
-            playerDao.update(player);
-        } catch (JSONException | IOException ex) {
-            throw ex;
+            Badge badgeQuery = new Badge();
+            badgeQuery.setAppId(badgeObject.getString("appid"));
+            badgeQuery.setBadgeId(badgeObject.getInt("badgeid"));
+            badgeQuery.setLevel(badgeObject.getInt("level"));
+
+            List<Badge> badgesResult = badgeDao.queryForMatchingArgs(badgeQuery);
+
+            Badge badge = null;
+            if (badgesResult.size() > 0) {
+                badge = badgesResult.get(0);
+            }
+
+            PlayerBadge playerBadge = new PlayerBadge();
+            playerBadge.setPlayer(player);
+            playerBadge.setAppId(badgeQuery.getAppId());
+            playerBadge.setBadgeId(badgeQuery.getBadgeId());
+            playerBadge.setLevel(badgeQuery.getLevel());
+            playerBadge.setBadge(badge);
+            playerBadgeDao.create(playerBadge);
         }
+
+        player.setBadgesLoaded(true);
+        playerDao.update(player);
     }
 
     private static JSONObject sendRequest(String method, HashMap<String, String> values) throws Exception {
@@ -166,8 +167,8 @@ public class Util {
         FileOutputStream outputStream;
 
         try {
-            outputStream = context.openFileOutput(context.getFilesDir() + filename, Context.MODE_PRIVATE);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
+            outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
             outputStream.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -175,32 +176,14 @@ public class Util {
     }
 
     public static void saveLocalBadgeImage(Context context, Badge badge, Bitmap bitmap) {
-        FileOutputStream outputStream;
-
-        try {
-            outputStream = context.openFileOutput(badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png", Context.MODE_PRIVATE);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        saveLocalImage(context, badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png", bitmap);
     }
 
     public static Bitmap openLocalImage(Context context, String filename) {
-        File imgFile = new  File(context.getFilesDir() + filename);
-
-        if(imgFile.exists()){
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-
-        return null;
-    }
-
-    public static Bitmap openLocalBadgeImage(Context context, PlayerBadge badge) {
         FileInputStream inputStream;
 
         try {
-            inputStream = context.openFileInput(badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png");
+            inputStream = context.openFileInput(filename);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             inputStream.close();
 
@@ -210,6 +193,10 @@ public class Util {
         }
 
         return null;
+    }
+
+    public static Bitmap openLocalBadgeImage(Context context, Badge badge) {
+        return openLocalImage(context, badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png");
     }
 
     public static int dpsToPixels(Context context, int dps) {

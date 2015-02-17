@@ -1,4 +1,4 @@
-package com.x7.steambadger;
+package com.x7.steambadger.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

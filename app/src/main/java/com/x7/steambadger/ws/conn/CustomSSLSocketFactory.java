@@ -1,4 +1,4 @@
-package com.x7.steambadger;
+package com.x7.steambadger.ws.conn;
 
 import org.apache.http.conn.ssl.SSLSocketFactory;
 

@@ -1,4 +1,4 @@
-package com.x7.steambadger;
+package com.x7.steambadger.util;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -20,7 +20,7 @@ public abstract class LoaderTask<C extends Context> extends AsyncTask<C, Object,
         if (dialog) {
         	this.dialog = new ProgressDialog(context);
         	this.dialog.setMessage("Loading...");
-        	this.dialog.setCancelable(true);
+        	this.dialog.setCancelable(false);
         	this.dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 				
 				public void onCancel(DialogInterface dialog) {

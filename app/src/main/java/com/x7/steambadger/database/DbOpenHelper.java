@@ -1,10 +1,14 @@
-package com.x7.steambadger;
+package com.x7.steambadger.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import com.x7.steambadger.application.SteamBadgeR;
+import com.x7.steambadger.database.model.Badge;
+import com.x7.steambadger.database.model.Player;
+import com.x7.steambadger.database.model.PlayerBadge;
 
 import java.sql.SQLException;
 

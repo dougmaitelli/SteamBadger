@@ -1,4 +1,4 @@
-package com.x7.steambadger;
+package com.x7.steambadger.application;
 
 import android.app.Application;
 

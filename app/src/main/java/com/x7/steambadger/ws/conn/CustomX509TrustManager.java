@@ -1,4 +1,4 @@
-package com.x7.steambadger;
+package com.x7.steambadger.ws.conn;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
