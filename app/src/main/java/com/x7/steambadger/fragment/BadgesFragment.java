@@ -1,6 +1,7 @@
 package com.x7.steambadger.fragment;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import com.x7.steambadger.database.DbOpenHelper;
 import com.x7.steambadger.database.model.Badge;
 import com.x7.steambadger.database.model.Player;
 import com.x7.steambadger.database.model.PlayerBadge;
+import com.x7.steambadger.util.LevelColor;
 import com.x7.steambadger.util.LoaderTask;
 import com.x7.steambadger.view.adapter.BadgeAdapter;
 import com.x7.steambadger.ws.Util;
@@ -36,6 +38,7 @@ public class BadgesFragment extends Fragment {
     private ImageView avatar;
     private TextView name;
     private ProgressBar levelProgress;
+    private TextView playerExp;
     private TextView level;
 
     private GridView badgesLayout;
@@ -63,6 +66,7 @@ public class BadgesFragment extends Fragment {
         avatar = (ImageView) getActivity().findViewById(R.id.player_photo);
         name = (TextView) getActivity().findViewById(R.id.player_name);
         levelProgress = (ProgressBar) getActivity().findViewById(R.id.level_progress);
+        playerExp = (TextView) getActivity().findViewById(R.id.player_exp);
         level = (TextView) getActivity().findViewById(R.id.level);
 
         badgesLayout = (GridView) getActivity().findViewById(R.id.badges_layout);
@@ -135,19 +139,23 @@ public class BadgesFragment extends Fragment {
 
                         this.doUpdate(badgeCount, playerBadges.size());
 
-                        if (badge == null) {
-                            try {
+                        try {
+                            if (badge == null) {
                                 badge = Util.loadBadgeData(playerBadge.getAppId(), playerBadge.getBadgeId(), playerBadge.getLevel());
                                 badgeDao.create(badge);
 
                                 playerBadge.setBadge(badge);
                                 playerBadges.update(playerBadge);
-
-                                Bitmap bitmap = Util.getRemoteImage(badge.getImageUrl());
-                                Util.saveLocalBadgeImage(getActivity(), badge, bitmap);
-                            } catch (Exception ex) {
-                                ex.printStackTrace(System.out);
                             }
+
+                            Bitmap badgeImage = Util.openLocalBadgeImage(getContext(), badge);
+
+                            if (badgeImage == null) {
+                                Bitmap bitmap = Util.getRemoteImage(badge.getImageUrl());
+                                Util.saveLocalBadgeImage(getContext(), badge, bitmap);
+                            }
+                        } catch (Exception ex) {
+                            ex.printStackTrace(System.out);
                         }
                     }
                 } catch (Exception ex) {
@@ -165,7 +173,10 @@ public class BadgesFragment extends Fragment {
                 avatar.setImageBitmap(Util.byteArrayToImage(player.getAvatar()));
                 name.setText(player.getName());
                 levelProgress.setProgress((int) ((double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel()) / (double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel() + player.getPlayerXpNeededToLevelUp()) * 100));
+                playerExp.setText("XP: " + player.getPlayerXp());
                 level.setText(String.valueOf(player.getPlayerLevel()));
+                level.getBackground().setLevel(player.getPlayerLevel());
+                ((GradientDrawable) level.getBackground().getCurrent()).setColor(LevelColor.getLevelColor(player.getPlayerLevel()).getColor());
 
                 adp.clear();
 

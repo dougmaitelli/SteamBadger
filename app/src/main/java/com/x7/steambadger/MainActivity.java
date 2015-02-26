@@ -61,6 +61,8 @@ public class MainActivity extends ActionBarActivity {
                 loadPlayerData();
             } else {
                 player = playerResult.get(0);
+
+                startMainFragment();
             }
         } catch (Exception ex) {
             ex.printStackTrace(System.out);
