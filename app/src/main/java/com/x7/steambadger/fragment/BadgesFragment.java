@@ -1,4 +1,4 @@
-package com.x7.steambadger;
+package com.x7.steambadger.fragment;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -9,30 +9,39 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.dao.ForeignCollection;
+import com.x7.steambadger.MainActivity;
+import com.x7.steambadger.R;
 import com.x7.steambadger.database.DbOpenHelper;
 import com.x7.steambadger.database.model.Badge;
 import com.x7.steambadger.database.model.Player;
 import com.x7.steambadger.database.model.PlayerBadge;
 import com.x7.steambadger.util.LoaderTask;
-import com.x7.steambadger.view.BadgeView;
-import com.x7.steambadger.view.FlowLayout;
+import com.x7.steambadger.view.adapter.BadgeAdapter;
 import com.x7.steambadger.ws.Util;
 
 import java.util.Collection;
-import java.util.List;
 
 public class BadgesFragment extends Fragment {
 
     private Player player;
 
-    private FlowLayout badgesLayout;
+    private ImageView avatar;
+    private TextView name;
+    private ProgressBar levelProgress;
+    private TextView level;
+
+    private GridView badgesLayout;
+    private BadgeAdapter adp;
 
     public BadgesFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -42,7 +51,6 @@ public class BadgesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_badges, container, false);
     }
 
@@ -52,26 +60,18 @@ public class BadgesFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        badgesLayout = (FlowLayout) getActivity().findViewById(R.id.badges_layout);
+        avatar = (ImageView) getActivity().findViewById(R.id.player_photo);
+        name = (TextView) getActivity().findViewById(R.id.player_name);
+        levelProgress = (ProgressBar) getActivity().findViewById(R.id.level_progress);
+        level = (TextView) getActivity().findViewById(R.id.level);
 
-        try {
-            String steamid = "76561198012101080";
+        badgesLayout = (GridView) getActivity().findViewById(R.id.badges_layout);
+        adp = new BadgeAdapter(getActivity());
 
-            Dao<Player, Long> playerDao = DaoManager.createDao(DbOpenHelper.getCon(), Player.class);
-            List<Player> playerResult = playerDao.queryForEq("steamId", steamid);
+        badgesLayout.setAdapter(adp);
 
-            if (playerResult.isEmpty()) {
-                player = new Player();
-                player.setSteamId(steamid);
-                playerDao.create(player);
-
-                playerResult = playerDao.queryForEq("steamId", steamid);
-            }
-
-            player = playerResult.get(0);
-        } catch (Exception ex) {
-            ex.printStackTrace(System.out);
-        }
+        Bundle extras = getArguments();
+        player = (Player) extras.getSerializable("player");
 
         if (player.isBadgesLoaded()) {
             showPlayerBadges();
@@ -162,7 +162,12 @@ public class BadgesFragment extends Fragment {
 
             @Override
             public void onComplete() {
-                badgesLayout.removeAllViews();
+                avatar.setImageBitmap(Util.byteArrayToImage(player.getAvatar()));
+                name.setText(player.getName());
+                levelProgress.setProgress((int) ((double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel()) / (double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel() + player.getPlayerXpNeededToLevelUp()) * 100));
+                level.setText(String.valueOf(player.getPlayerLevel()));
+
+                adp.clear();
 
                 Collection<PlayerBadge> playerBadges = player.getPlayerBadges();
 
@@ -173,9 +178,10 @@ public class BadgesFragment extends Fragment {
                         continue;
                     }
 
-                    BadgeView badgeView = new BadgeView(getContext(), badge);
-                    badgesLayout.addView(badgeView);
+                    adp.add(badge);
                 }
+
+                adp.notifyDataSetChanged();
             }
         };
     }

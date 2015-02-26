@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="center">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@drawable/badge_bg"
+    android:padding="5dp">
 
     <ImageView
         android:id="@+id/badge_image"
@@ -14,6 +16,15 @@
     <TextView
         android:id="@+id/badge_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:lines="2"
+        android:gravity="center"
+        android:textColor="#FFFFFFFF"/>
+
+    <TextView
+        android:id="@+id/badge_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF898989"/>
 
 </LinearLayout>

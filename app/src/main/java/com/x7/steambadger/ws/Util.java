@@ -26,6 +26,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,13 +37,36 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Created by I837119 on 13/02/2015.
- */
 public class Util {
 
     private static final String API_KEY = "27D8D587593B6BA04261A296F62DADAB";
     private static final String API_URL = "https://api.steampowered.com/";
+
+    public static String getSteamId(String customUrl) throws Exception {
+        HashMap<String, String> values = new HashMap<>();
+        values.put("vanityurl", customUrl);
+
+        JSONObject object = sendRequest("ISteamUser/ResolveVanityURL/v1/", values).getJSONObject("response");
+
+        return object.getString("steamid");
+    }
+
+    public static void getPlayerData(Player player) throws Exception {
+        Dao<Player, Long> playerDao = DaoManager.createDao(DbOpenHelper.getCon(), Player.class);
+
+        HashMap<String, String> values = new HashMap<>();
+        values.put("steamids", player.getSteamId().toString());
+
+        JSONObject object = sendRequest("ISteamUser/GetPlayerSummaries/v0002/", values).getJSONObject("response");
+
+        JSONObject playerObject = object.getJSONArray("players").getJSONObject(0);
+
+        player.setName(playerObject.getString("personaname"));
+        player.setAvatarUrl(playerObject.getString("avatarfull"));
+        player.setAvatar(imageToByteArray(getRemoteImage(player.getAvatarUrl())));
+
+        playerDao.update(player);
+    }
 
     public static void getPlayerBadges(Player player) throws Exception {
         Dao<Player, Long> playerDao = DaoManager.createDao(DbOpenHelper.getCon(), Player.class);
@@ -53,11 +77,15 @@ public class Util {
             playerBadgeDao.delete(playerBadge);
         }
 
-
         HashMap<String, String> values = new HashMap<>();
         values.put("steamid", player.getSteamId().toString());
 
         JSONObject object = sendRequest("IPlayerService/GetBadges/v1/", values).getJSONObject("response");
+
+        player.setPlayerXp(object.getLong("player_xp"));
+        player.setPlayerLevel(object.getInt("player_level"));
+        player.setPlayerXpNeededToLevelUp(object.getLong("player_xp_needed_to_level_up"));
+        player.setPlayerXpNeededCurrentLevel(object.getLong("player_xp_needed_current_level"));
 
         JSONArray badgesArray = object.getJSONArray("badges");
 
@@ -163,6 +191,16 @@ public class Util {
         return null;
     }
 
+    public static byte[] imageToByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
+
+    public static Bitmap byteArrayToImage(byte[] bytes) {
+        return (BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+    }
+
     public static void saveLocalImage(Context context, String filename, Bitmap bitmap) {
         FileOutputStream outputStream;
 
@@ -197,12 +235,6 @@ public class Util {
 
     public static Bitmap openLocalBadgeImage(Context context, Badge badge) {
         return openLocalImage(context, badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png");
-    }
-
-    public static int dpsToPixels(Context context, int dps) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        int pixels = (int) (dps * scale + 0.5f);
-        return pixels;
     }
 
 }

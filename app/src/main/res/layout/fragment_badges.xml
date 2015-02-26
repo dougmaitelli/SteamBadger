@@ -1,16 +1,79 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.x7.steambadger.BadgesFragment">
+    android:layout_height="match_parent" tools:context="com.x7.steambadger.fragment.BadgesFragment"
+    android:background="#FF232935">
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.x7.steambadger.view.FlowLayout
+        <RelativeLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true">
+
+            <ImageView
+                android:id="@+id/player_photo"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_margin="10dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/player_photo"
+                android:layout_toLeftOf="@+id/level"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/player_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="18sp"/>
+
+                <ProgressBar
+                    android:id="@+id/level_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/progressBarStyleHorizontal"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:textColor="#FFFFFFFF"
+                android:textSize="20sp"
+                android:padding="20dp"
+                android:background="@drawable/level_bg"
+                android:text="0"/>
+
+        </RelativeLayout>
+
+        <GridView
             android:id="@+id/badges_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="5dp"/>
-    </ScrollView>
+            android:columnWidth="90dp"
+            android:numColumns="auto_fit"
+            android:verticalSpacing="10dp"
+            android:horizontalSpacing="10dp"
+            android:stretchMode="columnWidth"
+            android:gravity="center"
+            android:padding="10dp"
+            android:clipToPadding="false"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/header"/>
+
+    </RelativeLayout>
 
 </FrameLayout>

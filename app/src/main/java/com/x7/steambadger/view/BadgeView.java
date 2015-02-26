@@ -1,9 +1,7 @@
 package com.x7.steambadger.view;
 
-import android.app.Service;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,8 +14,9 @@ public class BadgeView extends LinearLayout {
 
     private Badge badge;
 
-    private TextView badgeText;
     private ImageView badgeImage;
+    private TextView badgeText;
+    private TextView badgeLevel;
 
     public BadgeView(Context context) {
         super(context);
@@ -28,7 +27,6 @@ public class BadgeView extends LinearLayout {
         this.badge = badge;
 
         this.build();
-        this.refreshBadgeData();
     }
 
     public BadgeView(Context context, AttributeSet attrs){
@@ -40,19 +38,19 @@ public class BadgeView extends LinearLayout {
     }
 
     public void build() {
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Service.LAYOUT_INFLATER_SERVICE);
+        LinearLayout badgeView = (LinearLayout) inflate(getContext(), R.layout.badge_view, this);
 
-        LinearLayout badgeView = (LinearLayout) inflater.inflate(R.layout.badge_view, null);
-
-        badgeText = (TextView) badgeView.findViewById(R.id.badge_text);
         badgeImage = (ImageView) badgeView.findViewById(R.id.badge_image);
+        badgeText = (TextView) badgeView.findViewById(R.id.badge_text);
+        badgeLevel = (TextView) badgeView.findViewById(R.id.badge_level);
 
-        this.addView(badgeView);
+        this.refreshBadgeData();
     }
 
     public void refreshBadgeData() {
-        badgeText.setText(badge.getText());
         badgeImage.setImageBitmap(Util.openLocalBadgeImage(getContext(), badge));
+        badgeText.setText(badge.getText());
+        badgeLevel.setText("Lvl.: " + badge.getLevel());
     }
 
 }
