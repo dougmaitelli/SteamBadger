@@ -32,10 +32,6 @@ public class LoginActivity extends Activity {
                 login(customUrl);
             }
         });
-
-        if (!Config.getInstance().getSteamId().isEmpty()) {
-            mainActivity();
-        }
     }
 
     private void login(final String customUrl) {
@@ -59,14 +55,10 @@ public class LoginActivity extends Activity {
 
             @Override
             public void onComplete() {
-                mainActivity();
+                Intent activity = new Intent(getContext(), MainActivity.class);
+                startActivity(activity);
             }
         };
-    }
-
-    private void mainActivity() {
-        Intent activity = new Intent(this, MainActivity.class);
-        startActivity(activity);
     }
 
 }

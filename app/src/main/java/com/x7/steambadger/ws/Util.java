@@ -99,6 +99,7 @@ public class Util {
             Badge badgeQuery = new Badge();
             badgeQuery.setAppId(badgeObject.getString("appid"));
             badgeQuery.setBadgeId(badgeObject.getInt("badgeid"));
+            badgeQuery.setBorderColor(badgeObject.getInt("border_color"));
             badgeQuery.setLevel(badgeObject.getInt("level"));
 
             List<Badge> badgesResult = badgeDao.queryForMatchingArgs(badgeQuery);
@@ -112,6 +113,7 @@ public class Util {
             playerBadge.setPlayer(player);
             playerBadge.setAppId(badgeQuery.getAppId());
             playerBadge.setBadgeId(badgeQuery.getBadgeId());
+            playerBadge.setBorderColor(badgeQuery.getBorderColor());
             playerBadge.setLevel(badgeQuery.getLevel());
             playerBadge.setBadge(badge);
             playerBadgeDao.create(playerBadge);
@@ -134,13 +136,13 @@ public class Util {
         return new JSONObject(EntityUtils.toString(response.getEntity()));
     }
 
-    public static Badge loadBadgeData(String appid, int badgeid, int level) throws IOException {
+    public static Badge loadBadgeData(String appId, int badgeId, int borderColor, int level) throws IOException {
         Badge badge = null;
 
-        Document doc = Jsoup.connect("http://www.steamcardexchange.net/index.php?gamepage-appid-" + appid).get();
+        Document doc = Jsoup.connect("http://www.steamcardexchange.net/index.php?gamepage-appid-" + appId).get();
 
         Elements badgeContainers = doc.select(".showcase-element-container.badge");
-        Element badgeContainer = badgeContainers.get(badgeid - 1);
+        Element badgeContainer = badgeContainers.get(borderColor);
 
         Elements showcaseElements = badgeContainer.children();
 
@@ -153,8 +155,9 @@ public class Util {
 
             if (elementExperience.text().contains("Level " + level)) {
                 badge = new Badge();
-                badge.setAppId(appid);
-                badge.setBadgeId(badgeid);
+                badge.setAppId(appId);
+                badge.setBadgeId(badgeId);
+                badge.setBorderColor(borderColor);
                 badge.setLevel(level);
 
                 Element elementText = showcaseElement.select(".element-text").get(0);
@@ -214,7 +217,7 @@ public class Util {
     }
 
     public static void saveLocalBadgeImage(Context context, Badge badge, Bitmap bitmap) {
-        saveLocalImage(context, badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png", bitmap);
+        saveLocalImage(context, badge.getAppId() + "_" + badge.getBorderColor() + "_" + badge.getLevel() + ".png", bitmap);
     }
 
     public static Bitmap openLocalImage(Context context, String filename) {
@@ -234,7 +237,7 @@ public class Util {
     }
 
     public static Bitmap openLocalBadgeImage(Context context, Badge badge) {
-        return openLocalImage(context, badge.getAppId() + "_" + badge.getBadgeId() + "_" + badge.getLevel() + ".png");
+        return openLocalImage(context, badge.getAppId() + "_" + badge.getBorderColor() + "_" + badge.getLevel() + ".png");
     }
 
 }

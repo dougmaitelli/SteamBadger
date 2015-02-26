@@ -13,6 +13,8 @@ public class Badge {
     @DatabaseField
     private int badgeId;
     @DatabaseField
+    private int borderColor;
+    @DatabaseField
     private int level;
     @DatabaseField
     private String text;
@@ -41,6 +43,14 @@ public class Badge {
 
     public void setBadgeId(int badgeId) {
         this.badgeId = badgeId;
+    }
+
+    public int getBorderColor() {
+        return borderColor;
+    }
+
+    public void setBorderColor(int borderColor) {
+        this.borderColor = borderColor;
     }
 
     public int getLevel() {

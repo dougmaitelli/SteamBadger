@@ -1,5 +1,6 @@
 package com.x7.steambadger;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
+import com.x7.steambadger.activity.LoginActivity;
 import com.x7.steambadger.application.Config;
 import com.x7.steambadger.database.DbOpenHelper;
 import com.x7.steambadger.database.model.Player;
@@ -34,6 +36,14 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Config.getInstance().getSteamId().isEmpty()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+
+            finish();
+            return;
+        }
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
@@ -57,6 +67,8 @@ public class MainActivity extends ActionBarActivity {
                 player = new Player();
                 player.setSteamId(steamId);
                 playerDao.create(player);
+
+                playerDao.refresh(player);
 
                 loadPlayerData();
             } else {

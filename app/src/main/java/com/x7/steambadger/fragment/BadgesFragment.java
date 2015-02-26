@@ -141,7 +141,7 @@ public class BadgesFragment extends Fragment {
 
                         try {
                             if (badge == null) {
-                                badge = Util.loadBadgeData(playerBadge.getAppId(), playerBadge.getBadgeId(), playerBadge.getLevel());
+                                badge = Util.loadBadgeData(playerBadge.getAppId(), playerBadge.getBadgeId(), playerBadge.getBorderColor(), playerBadge.getLevel());
                                 badgeDao.create(badge);
 
                                 playerBadge.setBadge(badge);
