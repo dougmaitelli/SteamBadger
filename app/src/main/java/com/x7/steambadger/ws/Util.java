@@ -92,14 +92,14 @@ public class Util {
         for (int i = 0; i < badgesArray.length(); i++) {
             JSONObject badgeObject = badgesArray.getJSONObject(i);
 
-            if (!badgeObject.has("appid")) {
-                continue;
+            Badge badgeQuery = new Badge();
+            badgeQuery.setBadgeId(badgeObject.getInt("badgeid"));
+
+            if (badgeObject.has("appid")) {
+                badgeQuery.setAppId(badgeObject.getString("appid"));
+                badgeQuery.setBorderColor(badgeObject.getInt("border_color"));
             }
 
-            Badge badgeQuery = new Badge();
-            badgeQuery.setAppId(badgeObject.getString("appid"));
-            badgeQuery.setBadgeId(badgeObject.getInt("badgeid"));
-            badgeQuery.setBorderColor(badgeObject.getInt("border_color"));
             badgeQuery.setLevel(badgeObject.getInt("level"));
 
             List<Badge> badgesResult = badgeDao.queryForMatchingArgs(badgeQuery);
@@ -139,35 +139,53 @@ public class Util {
     public static Badge loadBadgeData(String appId, int badgeId, int borderColor, int level) throws IOException {
         Badge badge = null;
 
-        Document doc = Jsoup.connect("http://www.steamcardexchange.net/index.php?gamepage-appid-" + appId).get();
+        if (appId != null) {
+            Document doc = Jsoup.connect("http://www.steamcardexchange.net/index.php?gamepage-appid-" + appId).get();
 
-        Elements badgeContainers = doc.select(".showcase-element-container.badge");
-        Element badgeContainer = badgeContainers.get(borderColor);
+            Elements badgeContainers = doc.select(".showcase-element-container.badge");
+            Element badgeContainer = badgeContainers.get(borderColor);
 
-        Elements showcaseElements = badgeContainer.children();
+            Elements showcaseElements = badgeContainer.children();
 
-        for (Element showcaseElement : showcaseElements) {
-            if (!showcaseElement.hasText()) {
-                continue;
+            for (Element showcaseElement : showcaseElements) {
+                if (!showcaseElement.hasText()) {
+                    continue;
+                }
+
+                Element elementExperience = showcaseElement.select(".element-experience").get(0);
+
+                if (elementExperience.text().contains("Level " + level)) {
+                    badge = new Badge();
+                    badge.setAppId(appId);
+                    badge.setBadgeId(badgeId);
+                    badge.setBorderColor(borderColor);
+                    badge.setLevel(level);
+
+                    Element elementText = showcaseElement.select(".element-text").get(0);
+                    badge.setText(elementText.text());
+
+                    Element elementImage = showcaseElement.select(".element-image").get(0);
+                    badge.setImageUrl(elementImage.attr("src"));
+
+                    break;
+                }
             }
+        } else {
+            Document doc = Jsoup.connect("http://steamcommunity.com/id/DougM/badges/" + badgeId).get();
 
-            Element elementExperience = showcaseElement.select(".element-experience").get(0);
+            Elements badgeContainer = doc.select(".badge_info");
 
-            if (elementExperience.text().contains("Level " + level)) {
-                badge = new Badge();
-                badge.setAppId(appId);
-                badge.setBadgeId(badgeId);
-                badge.setBorderColor(borderColor);
-                badge.setLevel(level);
+            badge = new Badge();
+            badge.setAppId(appId);
+            badge.setBadgeId(badgeId);
+            badge.setBorderColor(borderColor);
+            badge.setLevel(level);
 
-                Element elementText = showcaseElement.select(".element-text").get(0);
-                badge.setText(elementText.text());
+            Element elementTitle = badgeContainer.select(".badge_info_title").get(0);
+            badge.setText(elementTitle.text());
 
-                Element elementImage = showcaseElement.select(".element-image").get(0);
-                badge.setImageUrl(elementImage.attr("src"));
-
-                break;
-            }
+            Element elementImage = badgeContainer.select(".badge_info_image img").get(0);
+            badge.setImageUrl(elementImage.attr("src"));
         }
 
         return badge;
@@ -217,7 +235,7 @@ public class Util {
     }
 
     public static void saveLocalBadgeImage(Context context, Badge badge, Bitmap bitmap) {
-        saveLocalImage(context, badge.getAppId() + "_" + badge.getBorderColor() + "_" + badge.getLevel() + ".png", bitmap);
+        saveLocalImage(context, badge.getBadgeId() + "_" + badge.getAppId() + "_" + badge.getBorderColor() + "_" + badge.getLevel() + ".png", bitmap);
     }
 
     public static Bitmap openLocalImage(Context context, String filename) {
@@ -237,7 +255,7 @@ public class Util {
     }
 
     public static Bitmap openLocalBadgeImage(Context context, Badge badge) {
-        return openLocalImage(context, badge.getAppId() + "_" + badge.getBorderColor() + "_" + badge.getLevel() + ".png");
+        return openLocalImage(context, badge.getBadgeId() + "_" + badge.getAppId() + "_" + badge.getBorderColor() + "_" + badge.getLevel() + ".png");
     }
 
 }

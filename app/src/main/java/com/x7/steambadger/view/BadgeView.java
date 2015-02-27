@@ -50,7 +50,12 @@ public class BadgeView extends LinearLayout {
     public void refreshBadgeData() {
         badgeImage.setImageBitmap(Util.openLocalBadgeImage(getContext(), badge));
         badgeText.setText(badge.getText());
-        badgeLevel.setText("Lvl.: " + badge.getLevel());
+
+        if (badge.getAppId() != null) {
+            badgeLevel.setText("Lvl.: " + badge.getLevel());
+        } else {
+            badgeLevel.setText(null);
+        }
     }
 
 }

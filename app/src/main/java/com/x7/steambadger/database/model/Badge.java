@@ -9,9 +9,9 @@ public class Badge {
     @DatabaseField(generatedId = true)
     private Long id;
     @DatabaseField
-    private String appId;
-    @DatabaseField
     private int badgeId;
+    @DatabaseField
+    private String appId;
     @DatabaseField
     private int borderColor;
     @DatabaseField
@@ -29,20 +29,20 @@ public class Badge {
         this.id = id;
     }
 
-    public String getAppId() {
-        return appId;
-    }
-
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
-
     public int getBadgeId() {
         return badgeId;
     }
 
     public void setBadgeId(int badgeId) {
         this.badgeId = badgeId;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public int getBorderColor() {
