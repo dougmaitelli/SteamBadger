@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.x7.steambadger.R;
 import com.x7.steambadger.database.model.Badge;
-import com.x7.steambadger.ws.Util;
+import com.x7.steambadger.util.Util;
 
 public class BadgeView extends LinearLayout {
 
