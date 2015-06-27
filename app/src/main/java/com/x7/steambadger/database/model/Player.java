@@ -7,6 +7,8 @@ import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @DatabaseTable
 public class Player implements Serializable {
@@ -34,7 +36,8 @@ public class Player implements Serializable {
     private boolean badgesLoaded = false;
 
     @ForeignCollectionField(eager = false)
-    private ForeignCollection<PlayerBadge> playerBadges;
+    private ForeignCollection<PlayerBadge> playerBadgesCollection;
+    private List<PlayerBadge> playerBadges = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -116,12 +119,23 @@ public class Player implements Serializable {
         this.badgesLoaded = badgesLoaded;
     }
 
-    public ForeignCollection<PlayerBadge> getPlayerBadges() {
+    public ForeignCollection<PlayerBadge> getPlayerBadgesCollection() {
+        return playerBadgesCollection;
+    }
+
+    public void setPlayerBadgesCollection(ForeignCollection<PlayerBadge> playerBadgesCollection) {
+        this.playerBadgesCollection = playerBadgesCollection;
+    }
+
+    public List<PlayerBadge> getPlayerBadges() {
+        if (playerBadgesCollection != null && !playerBadgesCollection.isEmpty()) {
+            playerBadges = new ArrayList<>(playerBadgesCollection);
+        }
+
         return playerBadges;
     }
 
-    public void setPlayerBadges(ForeignCollection<PlayerBadge> playerBadges) {
+    public void setPlayerBadges(List<PlayerBadge> playerBadges) {
         this.playerBadges = playerBadges;
     }
-
 }
