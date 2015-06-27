@@ -14,10 +14,8 @@ import com.x7.steambadger.activity.LoginActivity;
 import com.x7.steambadger.application.Config;
 import com.x7.steambadger.database.DbOpenHelper;
 import com.x7.steambadger.database.model.Player;
-import com.x7.steambadger.fragment.BadgesFragment;
+import com.x7.steambadger.fragment.ProfileFragment;
 import com.x7.steambadger.fragment.menu.NavigationDrawerFragment;
-import com.x7.steambadger.util.LoaderTask;
-import com.x7.steambadger.ws.Util;
 
 import java.util.List;
 
@@ -44,15 +42,12 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
 
+        mTitle = getTitle();
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
-
-        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
-
-        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 
         //DbOpenHelper.getInstance().dropTables(null, DbOpenHelper.getCon());
         DbOpenHelper.getInstance().createTables(null, DbOpenHelper.getCon());
@@ -69,16 +64,21 @@ public class MainActivity extends ActionBarActivity {
                 playerDao.create(player);
 
                 playerDao.refresh(player);
-
-                loadPlayerData();
             } else {
                 player = playerResult.get(0);
-
-                startMainFragment();
             }
         } catch (Exception ex) {
             ex.printStackTrace(System.out);
         }
+
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+
+        startMainFragment();
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public void setFragment(Fragment fragment) {
@@ -89,29 +89,10 @@ public class MainActivity extends ActionBarActivity {
                 .commit();
     }
 
-    private void loadPlayerData() {
-        new LoaderTask<MainActivity>(this, true) {
-
-            @Override
-            public void process() {
-                try {
-                    Util.getPlayerData(player);
-                } catch (Exception ex) {
-                    System.out.println(ex);
-                }
-            }
-
-            @Override
-            public void onComplete() {
-                startMainFragment();
-            }
-        };
-    }
-
     private void startMainFragment() {
         Bundle bundle = new Bundle();
         bundle.putSerializable("player", player);
-        Fragment fragment = new BadgesFragment();
+        Fragment fragment = new ProfileFragment();
         fragment.setArguments(bundle);
         setFragment(fragment);
     }
