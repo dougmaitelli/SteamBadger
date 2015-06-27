@@ -11,7 +11,7 @@ import com.x7.steambadger.MainActivity;
 import com.x7.steambadger.R;
 import com.x7.steambadger.application.Config;
 import com.x7.steambadger.util.LoaderTask;
-import com.x7.steambadger.ws.Util;
+import com.x7.steambadger.ws.Ws;
 
 public class LoginActivity extends Activity {
 
@@ -44,7 +44,7 @@ public class LoginActivity extends Activity {
             @Override
             public void process() {
                 try {
-                    String steamId = Util.getSteamId(customUrl);
+                    String steamId = Ws.getSteamId(customUrl);
 
                     Config.getInstance().setCustomUrl(customUrl);
                     Config.getInstance().setSteamId(steamId);
