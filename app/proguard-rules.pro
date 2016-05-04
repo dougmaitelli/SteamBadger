@@ -15,3 +15,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# OrmLite uses reflection
+-keepattributes **
+-dontoptimize
+-dontshrink
+-dontwarn **

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DatabaseTable
-public class Player implements Serializable {
+public class Player implements Comparable, Serializable {
 
     @DatabaseField(generatedId = true)
     private Long id;
@@ -137,5 +137,10 @@ public class Player implements Serializable {
 
     public void setPlayerBadges(List<PlayerBadge> playerBadges) {
         this.playerBadges = playerBadges;
+    }
+
+    @Override
+    public int compareTo(Object another) {
+        return name.compareTo(((Player) another).getName());
     }
 }

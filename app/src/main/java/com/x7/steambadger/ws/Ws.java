@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -88,7 +89,6 @@ public class Ws {
         for (int i = 0; i < playersArray.length(); i++) {
             JSONObject playerObject = playersArray.getJSONObject(i);
 
-
             Player player = requestedPlayers.get(playerObject.getString("steamid"));
 
             player.setName(playerObject.getString("personaname"));
@@ -111,7 +111,11 @@ public class Ws {
             player.setAvatar(Util.imageToByteArray(getRemoteImage(player.getAvatarUrl())));
         }
 
-        return new ArrayList<>(requestedPlayers.values());
+        List<Player> playerList = new ArrayList(requestedPlayers.values());
+
+        Collections.sort(playerList);
+
+        return playerList;
     }
 
     public static List<Player> getPlayerFriends(Player player) throws Exception{
