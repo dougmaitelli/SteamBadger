@@ -1,12 +1,18 @@
 package com.x7.steambadger;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -15,16 +21,19 @@ import com.x7.steambadger.application.Config;
 import com.x7.steambadger.database.DbOpenHelper;
 import com.x7.steambadger.database.model.Player;
 import com.x7.steambadger.fragment.ProfileFragment;
-import com.x7.steambadger.fragment.menu.NavigationDrawerFragment;
+import com.x7.steambadger.fragment.menu.MenuFragment;
 
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private NavigationDrawerFragment mNavigationDrawerFragment;
-    private CharSequence mTitle;
     private Player player;
+
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private Fragment mContent = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,21 +43,185 @@ public class MainActivity extends AppCompatActivity {
         if (Config.getInstance().getSteamId().isEmpty()) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
-
-            finish();
             return;
         }
-
-        mTitle = getTitle();
-
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
 
         //DbOpenHelper.getInstance().dropTables(null, DbOpenHelper.getCon());
         DbOpenHelper.getInstance().createTables(null, DbOpenHelper.getCon());
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayUseLogoEnabled(false);
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.menu, R.string.menu) {
+
+            public void onDrawerClosed(View drawerView) {
+                if(drawerView.equals(GravityCompat.START)) {
+                    supportInvalidateOptionsMenu();
+                }
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                if(drawerView.equals(GravityCompat.START)) {
+                    supportInvalidateOptionsMenu();
+                }
+            }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                if(drawerView.equals(GravityCompat.START)) {
+                    super.onDrawerSlide(drawerView, slideOffset);
+                }
+            }
+        };
+
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+        if (savedInstanceState != null) {
+            mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent");
+        }
+
+        getLoggedUser();
+
+        if (mContent == null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("player", player);
+            mContent = new ProfileFragment();
+            mContent.setArguments(bundle);
+        }
+
+        startView();
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    private void startView() {
+        // Menu
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.left_drawer, new MenuFragment())
+                .commit();
+
+        // Content
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content_frame, mContent)
+                .commit();
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.toogleMenu();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+        return true;
+    }
+
+    public void toogleMenu() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+            return;
+        }
+
+        if (navigateBack()) {
+            return;
+        }
+
+        this.moveTaskToBack(true);
+    }
+
+    public boolean navigateBack() {
+        if (getSupportFragmentManager().popBackStackImmediate()) {
+            mContent = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getSupportFragmentManager().putFragment(outState, "mContent", getSupportFragmentManager().findFragmentById(R.id.content_frame));
+    }
+
+    public void logoff() {
+        Config.getInstance().setSteamId(null);
+        Config.getInstance().setCustomUrl(null);
+        loginActivity();
+    }
+
+    public void loginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+
+        finish();
+    }
+
+    public void switchContent(Fragment fragment) {
+        switchContent(fragment, false);
+    }
+
+    public void switchContent(Fragment fragment, boolean dontStore) {
+        mDrawerLayout.closeDrawer(GravityCompat.START);
+
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content_frame);
+
+        if (currentFragment != null && currentFragment.getClass() == fragment.getClass()) {
+            return;
+        }
+
+        mContent = fragment;
+
+        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+
+        tx.replace(R.id.content_frame, fragment);
+
+        if (!dontStore) {
+            tx.addToBackStack(null);
+        }
+
+        tx.commit();
+    }
+
+    private void getLoggedUser() {
         try {
             String steamId = Config.getInstance().getSteamId();
 
@@ -65,33 +238,8 @@ public class MainActivity extends AppCompatActivity {
                 player = playerResult.get(0);
             }
         } catch (Exception ex) {
-            ex.printStackTrace(System.out);
+            ex.printStackTrace();
         }
-
-        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-
-        startMainFragment();
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
-    }
-
-    private void startMainFragment() {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("player", player);
-        Fragment fragment = new ProfileFragment();
-        fragment.setArguments(bundle);
-        setFragment(fragment);
     }
 
 }

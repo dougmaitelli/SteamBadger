@@ -3,8 +3,10 @@ package com.x7.steambadger.database.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
+
 @DatabaseTable
-public class Badge {
+public class Badge implements Serializable {
 
     @DatabaseField(generatedId = true)
     private Long id;

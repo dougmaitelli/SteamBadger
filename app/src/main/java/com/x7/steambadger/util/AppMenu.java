@@ -10,22 +10,23 @@ public enum AppMenu {
 
     PROFILE("Profile", ProfileFragment.class),
     BADGES("Badges", BadgesFragment.class),
-    FRIENDS("Friends", FriendsFragment.class);
+    FRIENDS("Friends", FriendsFragment.class),
+    LOGOFF("LogOff", null);
 
     private String description;
-    private Class<? extends Fragment> fragment;
+    private Class<? extends Fragment> fragmentClass;
 
-    AppMenu(String description, Class<? extends Fragment> fragment){
+    AppMenu(String description, Class<? extends Fragment> fragmentClass){
         this.description = description;
-        this.fragment = fragment;
+        this.fragmentClass = fragmentClass;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public Class<? extends Fragment> getFragment() {
-        return fragment;
+    public Class<? extends Fragment> getFragmentClass() {
+        return fragmentClass;
     }
 
     @Override

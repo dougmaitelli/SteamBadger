@@ -16,7 +16,7 @@
 #   public *;
 #}
 
-# OrmLite uses reflection
+# OrmLite
 -keepattributes **
 -dontoptimize
 -dontshrink

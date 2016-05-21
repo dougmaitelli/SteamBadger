@@ -6,22 +6,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.x7.steambadger.MainActivity;
 import com.x7.steambadger.R;
 import com.x7.steambadger.database.model.Player;
 import com.x7.steambadger.util.LoaderTask;
 import com.x7.steambadger.util.Util;
+import com.x7.steambadger.view.ProfileHeaderView;
 import com.x7.steambadger.ws.Ws;
 
 public class ProfileFragment extends Fragment {
 
     private Player player;
 
-    private ImageView avatar;
-    private TextView name;
+    private ProfileHeaderView header;
 
     public ProfileFragment() {
     }
@@ -40,10 +38,10 @@ public class ProfileFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setHasOptionsMenu(true);
+        Bundle extras = getArguments();
+        player = (Player) extras.getSerializable("player");
 
-        avatar = (ImageView) getActivity().findViewById(R.id.player_photo);
-        name = (TextView) getActivity().findViewById(R.id.player_name);
+        header = (ProfileHeaderView) getActivity().findViewById(R.id.header);
 
         Button badgesButton = (Button) getActivity().findViewById(R.id.badges_button);
         badgesButton.setOnClickListener(new View.OnClickListener() {
@@ -53,12 +51,21 @@ public class ProfileFragment extends Fragment {
                 bundle.putSerializable("player", player);
                 Fragment fragment = new BadgesFragment();
                 fragment.setArguments(bundle);
-                ((MainActivity) getActivity()).setFragment(fragment);
+                ((MainActivity) getActivity()).switchContent(fragment);
             }
         });
 
-        Bundle extras = getArguments();
-        player = (Player) extras.getSerializable("player");
+        Button friendsButton = (Button) getActivity().findViewById(R.id.friends_button);
+        friendsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("player", player);
+                Fragment fragment = new FriendsFragment();
+                fragment.setArguments(bundle);
+                ((MainActivity) getActivity()).switchContent(fragment);
+            }
+        });
 
         loadPlayerData();
     }
@@ -69,7 +76,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void process() {
                 try {
-                    if (((MainActivity) getActivity()).getPlayer().equals(player)) {
+                    if (context.getPlayer().equals(player)) {
                         Util.getPlayerData(player);
                     } else {
                         Ws.getPlayerData(player);
@@ -81,8 +88,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onComplete() {
-                avatar.setImageBitmap(Util.byteArrayToImage(player.getAvatar()));
-                name.setText(player.getName());
+                header.setPlayer(player);
             }
         };
     }

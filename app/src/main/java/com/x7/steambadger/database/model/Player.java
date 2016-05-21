@@ -1,7 +1,6 @@
 package com.x7.steambadger.database.model;
 
 import com.j256.ormlite.dao.ForeignCollection;
-import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -20,9 +19,9 @@ public class Player implements Comparable, Serializable {
     @DatabaseField
     private String name;
     @DatabaseField
+    private String profileUrl;
+    @DatabaseField
     private String avatarUrl;
-    @DatabaseField(dataType = DataType.BYTE_ARRAY)
-    private byte[] avatar;
     @DatabaseField(canBeNull = false)
     private long playerXp;
     @DatabaseField(canBeNull = false)
@@ -63,20 +62,20 @@ public class Player implements Comparable, Serializable {
         this.avatarUrl = avatarUrl;
     }
 
-    public byte[] getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(byte[] avatar) {
-        this.avatar = avatar;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getProfileUrl() {
+        return profileUrl;
+    }
+
+    public void setProfileUrl(String profileUrl) {
+        this.profileUrl = profileUrl;
     }
 
     public long getPlayerXp() {

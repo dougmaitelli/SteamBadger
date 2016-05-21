@@ -1,25 +1,41 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="com.x7.steambadger.fragment.BadgesFragment"
-    android:background="#FF232935">
+    android:background="@color/defaultBg">
 
-    <ImageView
-        android:id="@+id/player_photo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_margin="10dp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/player_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFFFF"
-        android:textSize="18sp"
-        android:singleLine="true"/>
+        <com.x7.steambadger.view.ProfileHeaderView
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true"/>
 
-    <Button
-        android:id="@+id/badges_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@+id/header"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/badges_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_badges"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/friends_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_friends"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </FrameLayout>

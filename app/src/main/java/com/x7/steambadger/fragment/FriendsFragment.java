@@ -3,6 +3,9 @@ package com.x7.steambadger.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -43,6 +46,9 @@ public class FriendsFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
+        Bundle extras = getArguments();
+        player = (Player) extras.getSerializable("player");
+
         friendsList = (ListView) getActivity().findViewById(R.id.list_friends);
         adp = new PlayerAdapter(getActivity());
 
@@ -55,14 +61,30 @@ public class FriendsFragment extends Fragment {
                 bundle.putSerializable("player", (Player) adp.getItem(position));
                 Fragment fragment = new ProfileFragment();
                 fragment.setArguments(bundle);
-                ((MainActivity) getActivity()).setFragment(fragment);
+                ((MainActivity) getActivity()).switchContent(fragment);
             }
         });
 
-        Bundle extras = getArguments();
-        player = (Player) extras.getSerializable("player");
-
         loadPlayerFriends();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.badges_fragment_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                loadPlayerFriends();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+        return true;
     }
 
     private void loadPlayerFriends() {
@@ -81,11 +103,15 @@ public class FriendsFragment extends Fragment {
 
             @Override
             public void onComplete() {
-                for (Player friend : friends) {
-                    adp.add(friend);
-                }
+                if (friends != null) {
+                    adp.clear();
 
-                adp.notifyDataSetChanged();
+                    for (Player friend : friends) {
+                        adp.add(friend);
+                    }
+
+                    adp.notifyDataSetChanged();
+                }
             }
         };
     }

@@ -1,25 +1,15 @@
 package com.x7.steambadger.ws;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
-import com.x7.steambadger.application.Config;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import com.x7.steambadger.database.DbOpenHelper;
 import com.x7.steambadger.database.model.Badge;
 import com.x7.steambadger.database.model.Player;
 import com.x7.steambadger.database.model.PlayerBadge;
-import com.x7.steambadger.util.Util;
-import com.x7.steambadger.ws.conn.DataLoader;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -28,14 +18,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Ws {
 
@@ -58,17 +44,14 @@ public class Ws {
         return getPlayerData(players, AvatarQuality.HIGH).get(0);
     }
 
-    public static enum AvatarQuality {
+    public enum AvatarQuality {
 
         LOW,
         MEDIUM,
-        HIGH;
-
+        HIGH
     }
 
     public static List<Player> getPlayerData(List<Player> players, AvatarQuality avatarQuality) throws Exception {
-        Dao<Player, Long> playerDao = DaoManager.createDao(DbOpenHelper.getCon(), Player.class);
-
         HashMap<String, Player> requestedPlayers = new HashMap<>();
 
         StringBuilder sb = new StringBuilder();
@@ -92,6 +75,7 @@ public class Ws {
             Player player = requestedPlayers.get(playerObject.getString("steamid"));
 
             player.setName(playerObject.getString("personaname"));
+            player.setProfileUrl(playerObject.getString("profileurl"));
 
             String avatarAttr;
             switch (avatarQuality) {
@@ -108,11 +92,9 @@ public class Ws {
             }
 
             player.setAvatarUrl(playerObject.getString(avatarAttr));
-            player.setAvatar(Util.imageToByteArray(getRemoteImage(player.getAvatarUrl())));
         }
 
-        List<Player> playerList = new ArrayList(requestedPlayers.values());
-
+        List<Player> playerList = new ArrayList<>(requestedPlayers.values());
         Collections.sort(playerList);
 
         return playerList;
@@ -120,7 +102,7 @@ public class Ws {
 
     public static List<Player> getPlayerFriends(Player player) throws Exception{
         HashMap<String, String> values = new HashMap<>();
-        values.put("steamid", player.getSteamId().toString());
+        values.put("steamid", player.getSteamId());
 
         JSONObject object = sendRequest("ISteamUser/GetFriendList/v1/", values).getJSONObject("friendslist");
 
@@ -137,14 +119,15 @@ public class Ws {
             friendList.add(friend);
         }
 
-        return getPlayerData(friendList, AvatarQuality.LOW);
+        return getPlayerData(friendList, AvatarQuality.HIGH);
     }
 
     public static Player getPlayerBadges(Player player) throws Exception {
         Dao<Badge, Long> badgeDao = DaoManager.createDao(DbOpenHelper.getCon(), Badge.class);
+        Dao<PlayerBadge, Long> playerBadgeDao = DaoManager.createDao(DbOpenHelper.getCon(), PlayerBadge.class);
 
         HashMap<String, String> values = new HashMap<>();
-        values.put("steamid", player.getSteamId().toString());
+        values.put("steamid", player.getSteamId());
 
         JSONObject object = sendRequest("IPlayerService/GetBadges/v1/", values).getJSONObject("response");
 
@@ -158,28 +141,26 @@ public class Ws {
         for (int i = 0; i < badgesArray.length(); i++) {
             JSONObject badgeObject = badgesArray.getJSONObject(i);
 
-            Badge badgeQuery = new Badge();
-            badgeQuery.setBadgeId(badgeObject.getInt("badgeid"));
+            Badge badge = new Badge();
+            badge.setBadgeId(badgeObject.getInt("badgeid"));
 
             if (badgeObject.has("appid")) {
-                badgeQuery.setAppId(badgeObject.getString("appid"));
-                badgeQuery.setBorderColor(badgeObject.getInt("border_color"));
+                badge.setAppId(badgeObject.getString("appid"));
+                badge.setBorderColor(badgeObject.getInt("border_color"));
             }
 
-            badgeQuery.setLevel(badgeObject.getInt("level"));
+            badge.setLevel(badgeObject.getInt("level"));
 
-            List<Badge> badgesResult = badgeDao.queryForMatchingArgs(badgeQuery);
+            List<Badge> badgesResult = badgeDao.queryForMatchingArgs(badge);
 
-            Badge badge = null;
             if (badgesResult.size() > 0) {
                 badge = badgesResult.get(0);
+            } else {
+                badgeDao.create(badge);
             }
 
             PlayerBadge playerBadge = new PlayerBadge();
-            playerBadge.setAppId(badgeQuery.getAppId());
-            playerBadge.setBadgeId(badgeQuery.getBadgeId());
-            playerBadge.setBorderColor(badgeQuery.getBorderColor());
-            playerBadge.setLevel(badgeQuery.getLevel());
+            playerBadge.setPlayer(player);
             playerBadge.setBadge(badge);
 
             if (player.getId() == null) {
@@ -199,20 +180,19 @@ public class Ws {
             requestUrl += "&" + key + "=" + values.get(key);
         }
 
-        DataLoader dl = new DataLoader();
-        HttpResponse response = dl.secureLoadData(requestUrl);
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder().url(requestUrl).build();
+        Response response = client.newCall(request).execute();
 
-        return new JSONObject(EntityUtils.toString(response.getEntity()));
+        return new JSONObject(response.body().string());
     }
 
-    public static Badge loadBadgeData(String appId, int badgeId, int borderColor, int level) throws IOException {
-        Badge badge = null;
-
-        if (appId != null) {
-            Document doc = Jsoup.connect("http://www.steamcardexchange.net/index.php?gamepage-appid-" + appId).get();
+    public static void loadBadgeData(Player player, Badge badge) throws IOException {
+        if (badge.getAppId() != null) {
+            Document doc = Jsoup.connect("http://www.steamcardexchange.net/index.php?gamepage-appid-" + badge.getAppId()).get();
 
             Elements badgeContainers = doc.select(".showcase-element-container.badge");
-            Element badgeContainer = badgeContainers.get(borderColor);
+            Element badgeContainer = badgeContainers.get(badge.getBorderColor());
 
             Elements showcaseElements = badgeContainer.children();
 
@@ -223,13 +203,7 @@ public class Ws {
 
                 Element elementExperience = showcaseElement.select(".element-experience").get(0);
 
-                if (elementExperience.text().contains("Level " + level)) {
-                    badge = new Badge();
-                    badge.setAppId(appId);
-                    badge.setBadgeId(badgeId);
-                    badge.setBorderColor(borderColor);
-                    badge.setLevel(level);
-
+                if (elementExperience.text().contains("Level " + badge.getLevel())) {
                     Element elementText = showcaseElement.select(".element-text").get(0);
                     badge.setText(elementText.text());
 
@@ -240,15 +214,9 @@ public class Ws {
                 }
             }
         } else {
-            Document doc = Jsoup.connect("http://steamcommunity.com/id/" + Config.getInstance().getCustomUrl() + "/badges/" + badgeId).get();
+            Document doc = Jsoup.connect(player.getProfileUrl() + "/badges/" + badge.getBadgeId()).get();
 
             Elements badgeContainer = doc.select(".badge_info");
-
-            badge = new Badge();
-            badge.setAppId(appId);
-            badge.setBadgeId(badgeId);
-            badge.setBorderColor(borderColor);
-            badge.setLevel(level);
 
             Element elementTitle = badgeContainer.select(".badge_info_title").get(0);
             badge.setText(elementTitle.text());
@@ -257,28 +225,7 @@ public class Ws {
             badge.setImageUrl(elementImage.attr("src"));
         }
 
-        return badge;
-    }
 
-    public static Bitmap getRemoteImage(String url) {
-        try {
-            HttpClient client = new DefaultHttpClient();
-            HttpGet request = new HttpGet(URI.create(url));
-            HttpResponse response = client.execute(request);
-            HttpEntity entity = response.getEntity();
-            BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
-            InputStream inStream = bufHttpEntity.getContent();
-
-            Bitmap bm = BitmapFactory.decodeStream(inStream);
-
-            inStream.close();
-
-            return bm;
-        } catch (Exception ex) {
-            Logger.getLogger(Ws.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return null;
     }
 
 }

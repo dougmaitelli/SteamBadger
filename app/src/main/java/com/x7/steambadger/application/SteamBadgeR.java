@@ -2,9 +2,8 @@ package com.x7.steambadger.application;
 
 import android.app.Application;
 
-import com.splunk.mint.Mint;
-import com.crashlytics.android.Crashlytics;
-import io.fabric.sdk.android.Fabric;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 
 public class SteamBadgeR extends Application {
 
@@ -16,10 +15,12 @@ public class SteamBadgeR extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Fabric.with(this, new Crashlytics());
 		SteamBadgeR.singleton = this;
 
-		Mint.initAndStartSession(this, "78b121ad");
+		Picasso.Builder builder = new Picasso.Builder(this);
+		builder.downloader(new OkHttpDownloader(this, Integer.MAX_VALUE));
+		Picasso built = builder.build();
+		Picasso.setSingletonInstance(built);
 	}
 
 	public static SteamBadgeR getInstance() {

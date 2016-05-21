@@ -1,7 +1,5 @@
 package com.x7.steambadger.fragment;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,36 +9,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.dao.DaoManager;
 import com.x7.steambadger.MainActivity;
 import com.x7.steambadger.R;
-import com.x7.steambadger.database.DbOpenHelper;
-import com.x7.steambadger.database.model.Badge;
 import com.x7.steambadger.database.model.Player;
 import com.x7.steambadger.database.model.PlayerBadge;
-import com.x7.steambadger.util.LevelColor;
 import com.x7.steambadger.util.LoaderTask;
 import com.x7.steambadger.util.Util;
+import com.x7.steambadger.view.ProfileHeaderView;
 import com.x7.steambadger.view.adapter.BadgeAdapter;
 import com.x7.steambadger.ws.Ws;
-
-import java.util.List;
 
 public class BadgesFragment extends Fragment {
 
     private Player player;
 
-    private ImageView avatar;
-    private TextView name;
-    private ProgressBar levelProgress;
-    private TextView playerExp;
-    private TextView level;
-
+    private ProfileHeaderView header;
     private GridView badgesLayout;
     private BadgeAdapter adp;
 
@@ -63,19 +47,16 @@ public class BadgesFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        avatar = (ImageView) getActivity().findViewById(R.id.player_photo);
-        name = (TextView) getActivity().findViewById(R.id.player_name);
-        levelProgress = (ProgressBar) getActivity().findViewById(R.id.level_progress);
-        playerExp = (TextView) getActivity().findViewById(R.id.player_exp);
-        level = (TextView) getActivity().findViewById(R.id.level);
-
-        badgesLayout = (GridView) getActivity().findViewById(R.id.badges_layout);
-        adp = new BadgeAdapter(getActivity());
-
-        badgesLayout.setAdapter(adp);
-
         Bundle extras = getArguments();
         player = (Player) extras.getSerializable("player");
+
+        header = (ProfileHeaderView) getActivity().findViewById(R.id.header);
+        header.setPlayer(player);
+
+        badgesLayout = (GridView) getActivity().findViewById(R.id.badges_layout);
+        adp = new BadgeAdapter(getActivity(), player);
+
+        badgesLayout.setAdapter(adp);
 
         if (player.isBadgesLoaded()) {
             showPlayerBadges();
@@ -109,13 +90,13 @@ public class BadgesFragment extends Fragment {
             @Override
             public void process() {
                 try {
-                    if (((MainActivity) getActivity()).getPlayer().equals(player)) {
+                    if (getContext().getPlayer().equals(player)) {
                         Util.getPlayerBadges(player);
                     } else {
                         Ws.getPlayerBadges(player);
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace(System.out);
+                    ex.printStackTrace();
                 }
             }
 
@@ -127,80 +108,17 @@ public class BadgesFragment extends Fragment {
     }
 
     private void showPlayerBadges() {
-        new LoaderTask<MainActivity>((MainActivity) getActivity(), true) {
+        header.refreshData();
 
-            @Override
-            public void process() {
-                try {
-                    Dao<PlayerBadge, Long> playerBadgeDao = DaoManager.createDao(DbOpenHelper.getCon(), PlayerBadge.class);
-                    Dao<Badge, Long> badgeDao = DaoManager.createDao(DbOpenHelper.getCon(), Badge.class);
+        adp.clear();
 
-                    List<PlayerBadge> playerBadges = player.getPlayerBadges();
-
-                    int badgeCount = 0;
-                    for (PlayerBadge playerBadge : playerBadges) {
-                        Badge badge = playerBadge.getBadge();
-                        badgeCount++;
-
-                        this.doUpdate(badgeCount, playerBadges.size());
-
-                        try {
-                            if (badge == null) {
-                                badge = Ws.loadBadgeData(playerBadge.getAppId(), playerBadge.getBadgeId(), playerBadge.getBorderColor(), playerBadge.getLevel());
-                                badgeDao.create(badge);
-
-                                playerBadge.setBadge(badge);
-
-                                if (((MainActivity) getActivity()).getPlayer().equals(player)) {
-                                    playerBadgeDao.update(playerBadge);
-                                }
-                            }
-
-                            Bitmap badgeImage = Util.openLocalBadgeImage(getContext(), badge);
-
-                            if (badgeImage == null) {
-                                Bitmap bitmap = Ws.getRemoteImage(badge.getImageUrl());
-                                Util.saveLocalBadgeImage(getContext(), badge, bitmap);
-                            }
-                        } catch (Exception ex) {
-                            ex.printStackTrace(System.out);
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace(System.out);
-                }
+        if (player.getPlayerBadges() != null) {
+            for (PlayerBadge playerBadge : player.getPlayerBadges()) {
+                adp.add(playerBadge.getBadge());
             }
+        }
 
-            @Override
-            public void onUpdate(Object... values) {
-                this.dialog.setMessage("Loading Badge " + values[0] + "/" + values[1]);
-            }
-
-            @Override
-            public void onComplete() {
-                avatar.setImageBitmap(Util.byteArrayToImage(player.getAvatar()));
-                name.setText(player.getName());
-                levelProgress.setProgress((int) ((double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel()) / (double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel() + player.getPlayerXpNeededToLevelUp()) * 100));
-                playerExp.setText("XP: " + player.getPlayerXp());
-                level.setText(String.valueOf(player.getPlayerLevel()));
-                level.getBackground().setLevel(player.getPlayerLevel());
-                ((GradientDrawable) level.getBackground().getCurrent()).setColor(LevelColor.getLevelColor(player.getPlayerLevel()).getColor());
-
-                adp.clear();
-
-                for (PlayerBadge playerBadge : player.getPlayerBadges()) {
-                    Badge badge = playerBadge.getBadge();
-
-                    if (badge == null) {
-                        continue;
-                    }
-
-                    adp.add(badge);
-                }
-
-                adp.notifyDataSetChanged();
-            }
-        };
+        adp.notifyDataSetChanged();
     }
 
 }

@@ -8,9 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.x7.steambadger.R;
 import com.x7.steambadger.database.model.Player;
-import com.x7.steambadger.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +75,7 @@ public class PlayerAdapter extends BaseAdapter {
         ImageView playerAvatar = (ImageView) view.findViewById(R.id.player_avatar);
         TextView playerName = (TextView) view.findViewById(R.id.player_name);
 
-        playerAvatar.setImageBitmap(Util.byteArrayToImage(player.getAvatar()));
+        Picasso.with(context).load(player.getAvatarUrl()).into(playerAvatar);
         playerName.setText(player.getName());
 
         return view;
