@@ -6,10 +6,10 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
 
-    <color name="colorPrimary">#293027</color>
-    <color name="colorPrimaryDark">#252B23</color>
+    <color name="colorPrimary">#373737</color>
+    <color name="colorPrimaryDark">#282828</color>
     <color name="colorAccent">#727272</color>
 
     <color name="defaultBg">#232935</color>
-    <color name="menuBg">#CCCCCC</color>
+    <color name="menuBg">#454545</color>
 </resources>
