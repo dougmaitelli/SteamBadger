@@ -1,31 +1,27 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.x7.steambadger.fragment.BadgesFragment">
+    android:layout_height="match_parent" tools:context=".fragment.BadgesFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.x7.steambadger.view.ProfileHeaderView
-            android:id="@+id/header"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_alignParentTop="true"/>
-
-        <GridView
+        <com.dougmaitelli.steambadger.view.AutofitRecyclerView
             android:id="@+id/badges_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:columnWidth="90dp"
-            android:numColumns="auto_fit"
-            android:verticalSpacing="10dp"
-            android:horizontalSpacing="10dp"
-            android:stretchMode="columnWidth"
-            android:gravity="center"
             android:padding="10dp"
             android:clipToPadding="false"
             android:layout_alignParentBottom="true"
-            android:layout_below="@+id/header"/>
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="100dp"/>
+
+        <com.dougmaitelli.steambadger.view.ProfileHeaderView
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"/>
 
     </RelativeLayout>
 

@@ -5,7 +5,7 @@ android {
     buildToolsVersion "27.0.0"
 
     defaultConfig {
-        applicationId "com.x7.steambadger"
+        applicationId "com.dougmaitelli.steambadger"
         minSdkVersion 17
         targetSdkVersion 25
         versionCode 1
@@ -13,7 +13,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -28,8 +28,8 @@ dependencies {
 
     compile 'com.google.firebase:firebase-crash:9.0.0'
 
-    compile 'com.j256.ormlite:ormlite-core:4.48'
-    compile 'com.j256.ormlite:ormlite-android:4.48'
+    compile 'com.j256.ormlite:ormlite-core:5.0'
+    compile 'com.j256.ormlite:ormlite-android:5.0'
 
     compile 'org.jsoup:jsoup:1.10.3'
 
