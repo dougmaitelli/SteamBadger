@@ -1,41 +1,35 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.x7.steambadger.fragment.BadgesFragment"
-    android:background="@color/defaultBg">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.BadgesFragment">
 
-    <RelativeLayout
+    <com.x7.steambadger.view.ProfileHeaderView
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/badges_button"
+        app:layout_constraintStart_toEndOf="@+id/badges_button"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.x7.steambadger.view.ProfileHeaderView
-            android:id="@+id/header"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_alignParentTop="true"/>
+    <Button
+        android:id="@+id/badges_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_badges"
+        app:layout_constraintBaseline_toBaselineOf="@+id/friends_button"
+        app:layout_constraintEnd_toStartOf="@+id/friends_button"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@+id/header"
-            android:weightSum="2">
+    <Button
+        android:id="@+id/friends_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/button_friends"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/badges_button"
+        app:layout_constraintTop_toBottomOf="@+id/header" />
 
-            <Button
-                android:id="@+id/badges_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/button_badges"
-                android:layout_weight="1"/>
-
-            <Button
-                android:id="@+id/friends_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/button_friends"
-                android:layout_weight="1"/>
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>

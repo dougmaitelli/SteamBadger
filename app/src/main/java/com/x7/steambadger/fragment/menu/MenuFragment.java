@@ -26,7 +26,7 @@ public class MenuFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        ListView listView = (ListView) getActivity().findViewById(R.id.menu_container);
+        ListView listView = getActivity().findViewById(R.id.menu_container);
 
         adp = new MenuAdapter(getActivity());
         listView.setAdapter(adp);

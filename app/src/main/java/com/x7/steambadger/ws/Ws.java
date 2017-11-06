@@ -188,44 +188,21 @@ public class Ws {
     }
 
     public static void loadBadgeData(Player player, Badge badge) throws IOException {
+        String url = "badges/" + badge.getBadgeId();
+
         if (badge.getAppId() != null) {
-            Document doc = Jsoup.connect("http://www.steamcardexchange.net/index.php?gamepage-appid-" + badge.getAppId()).get();
-
-            Elements badgeContainers = doc.select(".showcase-element-container.badge");
-            Element badgeContainer = badgeContainers.get(badge.getBorderColor());
-
-            Elements showcaseElements = badgeContainer.children();
-
-            for (Element showcaseElement : showcaseElements) {
-                if (!showcaseElement.hasText()) {
-                    continue;
-                }
-
-                Element elementExperience = showcaseElement.select(".element-experience").get(0);
-
-                if (elementExperience.text().contains("Level " + badge.getLevel())) {
-                    Element elementText = showcaseElement.select(".element-text").get(0);
-                    badge.setText(elementText.text());
-
-                    Element elementImage = showcaseElement.select(".element-image").get(0);
-                    badge.setImageUrl(elementImage.attr("src"));
-
-                    break;
-                }
-            }
-        } else {
-            Document doc = Jsoup.connect(player.getProfileUrl() + "/badges/" + badge.getBadgeId()).get();
-
-            Elements badgeContainer = doc.select(".badge_info");
-
-            Element elementTitle = badgeContainer.select(".badge_info_title").get(0);
-            badge.setText(elementTitle.text());
-
-            Element elementImage = badgeContainer.select(".badge_info_image img").get(0);
-            badge.setImageUrl(elementImage.attr("src"));
+            url = "gamecards/" + badge.getAppId();
         }
 
+        Document doc = Jsoup.connect(player.getProfileUrl() + "/" + url).get();
 
+        Elements badgeContainer = doc.select(".badge_info");
+
+        Element elementTitle = badgeContainer.select(".badge_info_title").get(0);
+        badge.setText(elementTitle.text());
+
+        Element elementImage = badgeContainer.select(".badge_info_image img").get(0);
+        badge.setImageUrl(elementImage.attr("src"));
     }
 
 }
