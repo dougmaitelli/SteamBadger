@@ -21,15 +21,15 @@ android:
     
     - build-tools-$ANDROID_BUILD_TOOLS
     - android-$ANDROID_API
-    - android-$EMULATOR_API_LEVEL
+    - android-$EMULATOR_API
     
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository # for design library
     - addon-google_apis-google-25 # google play services
     
-    - sys-img-armeabi-v7a-addon-google_apis-google-$ANDROID_API_LEVEL
-    - sys-img-armeabi-v7a-android-$EMULATOR_API_LEVEL
+    - sys-img-armeabi-v7a-addon-google_apis-google-$ANDROID_API
+    - sys-img-armeabi-v7a-android-$EMULATOR_API
     
 licenses:
   - android-sdk-preview-license-.+
