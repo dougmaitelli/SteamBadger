@@ -55,31 +55,10 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayUseLogoEnabled(false);
-        actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.menu, R.string.menu) {
-
-            public void onDrawerClosed(View drawerView) {
-                if(drawerView.equals(GravityCompat.START)) {
-                    supportInvalidateOptionsMenu();
-                }
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                if(drawerView.equals(GravityCompat.START)) {
-                    supportInvalidateOptionsMenu();
-                }
-            }
-
-            @Override
-            public void onDrawerSlide(View drawerView, float slideOffset) {
-                if(drawerView.equals(GravityCompat.START)) {
-                    super.onDrawerSlide(drawerView, slideOffset);
-                }
-            }
-        };
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.menu, R.string.menu);
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
