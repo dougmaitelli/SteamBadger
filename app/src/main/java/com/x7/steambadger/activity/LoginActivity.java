@@ -3,9 +3,12 @@ package com.x7.steambadger.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.x7.steambadger.MainActivity;
 import com.x7.steambadger.R;
@@ -20,18 +23,49 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        final EditText customUrlEdit = (EditText) findViewById(R.id.custom_url);
+        final EditText customUrlEdit = findViewById(R.id.custom_url);
+        final Button loginButton = findViewById(R.id.login_button);
 
-        Button loginButton = (Button) findViewById(R.id.login_button);
+        customUrlEdit.setOnEditorActionListener(new EditText.OnEditorActionListener() {
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    loginButton.performClick();
+                    return true;
+                }
 
-            public void onClick(View view) {
-                String customUrl = customUrlEdit.getText().toString();
-
-                login(customUrl);
+                return false;
             }
         });
+    }
+
+    private static class LoginTask extends LoaderTask<LoginActivity> {
+
+        String customUrl;
+
+        private LoginTask(LoginActivity ctx, String customUrl) {
+            super(ctx);
+            this.customUrl = customUrl;
+        }
+
+        @Override
+        public void process() {
+            try {
+                String steamId = Ws.getSteamId(customUrl);
+
+                Config.getInstance().setCustomUrl(customUrl);
+                Config.getInstance().setSteamId(steamId);
+            } catch (Exception ex) {
+                Toast.makeText(getContext(), R.string.login_error, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onComplete() {
+            Intent activity = new Intent(getContext(), MainActivity.class);
+            getContext().startActivity(activity);
+        }
     }
 
     private void login(final String customUrl) {
@@ -39,26 +73,7 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        new LoaderTask<LoginActivity>(this) {
-
-            @Override
-            public void process() {
-                try {
-                    String steamId = Ws.getSteamId(customUrl);
-
-                    Config.getInstance().setCustomUrl(customUrl);
-                    Config.getInstance().setSteamId(steamId);
-                } catch (Exception ex) {
-                    System.out.println(ex);
-                }
-            }
-
-            @Override
-            public void onComplete() {
-                Intent activity = new Intent(getContext(), MainActivity.class);
-                startActivity(activity);
-            }
-        };
+        new LoginTask(this, customUrl);
     }
 
 }
