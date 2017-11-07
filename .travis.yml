@@ -52,11 +52,11 @@ before_deploy:
   - cp $TRAVIS_BUILD_DIR/keystore.jks $HOME
   - cd app/build/outputs/apk/release/
   - ls -la
-  - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $HOME/keystore.jks -storepass $storepass -keypass $keypass app-unsigned.apk key0
+  - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $HOME/keystore.jks -storepass $storepass -keypass $keypass app-release-unsigned.apk key0
 
   # Verification
-  - jarsigner -verify app-unsigned.apk
-  - "${ANDROID_HOME}/build-tools/27.0.0/zipalign -v 4 app-unsigned.apk SteamBadger.apk"
+  - jarsigner -verify app-release-unsigned.apk
+  - "${ANDROID_HOME}/build-tools/27.0.0/zipalign -v 4 app-release-unsigned.apk SteamBadger.apk"
 
 deploy:
   provider: releases
