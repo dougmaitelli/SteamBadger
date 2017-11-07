@@ -76,6 +76,9 @@
     <init>();
 }
 
+# Keep Jsoup
+-keep class org.jsoup.**
+
 # Keep Picasso
 -keep class com.squareup.picasso.** { *; }
 -keepclasseswithmembers class * {
