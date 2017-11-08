@@ -17,7 +17,7 @@
 #}
 
 # Obfuscation parameters:
-#-dontobfuscate
+-dontobfuscate
 -useuniqueclassmembernames
 -keepattributes SourceFile,LineNumberTable
 -allowaccessmodification

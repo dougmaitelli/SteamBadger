@@ -76,11 +76,11 @@ public class ProfileHeaderView extends LinearLayout {
             progressBarHandler.post(new Runnable() {
 
                 public void run() {
-                    levelProgress.setProgress((int) ((double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel()) / (double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel() + player.getPlayerXpNeededToLevelUp()) * 100));
+                levelProgress.setProgress((int) ((double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel()) / (double) (player.getPlayerXp() - player.getPlayerXpNeededCurrentLevel() + player.getPlayerXpNeededToLevelUp()) * 100));
                 }
             });
 
-            playerExp.setText("XP: " + player.getPlayerXp());
+            playerExp.setText(getResources().getString(R.string.xp, player.getPlayerXp()));
             level.setText(String.valueOf(player.getPlayerLevel()));
             level.getBackground().setLevel(player.getPlayerLevel());
             ((GradientDrawable) level.getBackground().getCurrent()).setColor(LevelColor.getLevelColor(player.getPlayerLevel()).getColor());

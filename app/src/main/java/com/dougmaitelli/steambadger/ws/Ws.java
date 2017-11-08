@@ -124,7 +124,6 @@ public class Ws {
 
     public static Player getPlayerBadges(Player player) throws Exception {
         Dao<Badge, Long> badgeDao = DaoManager.createDao(DbOpenHelper.getCon(), Badge.class);
-        Dao<PlayerBadge, Long> playerBadgeDao = DaoManager.createDao(DbOpenHelper.getCon(), PlayerBadge.class);
 
         HashMap<String, String> values = new HashMap<>();
         values.put("steamid", player.getSteamId());
