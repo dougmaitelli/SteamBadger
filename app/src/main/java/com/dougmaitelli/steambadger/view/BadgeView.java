@@ -1,7 +1,9 @@
 package com.dougmaitelli.steambadger.view;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -69,10 +71,11 @@ public class BadgeView extends LinearLayout {
             badgeImage.setImageBitmap(null);
             badgeText.setText(null);
 
-            new LoaderTask<Context>(getContext(), false) {
+            final Handler imageHandler = new Handler();
 
-                @Override
-                public void process() {
+            new Thread(new Runnable() {
+
+                public void run() {
                     try {
                         Dao<Badge, Long> badgeDao = DaoManager.createDao(DbOpenHelper.getCon(), Badge.class);
 
@@ -81,21 +84,24 @@ public class BadgeView extends LinearLayout {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
-                }
 
-                @Override
-                public void onComplete() {
-                    Picasso.with(getContext()).load(badge.getImageUrl()).into(badgeImage);
-                    badgeText.setText(badge.getText());
+                    imageHandler.post(new Runnable() {
+
+                        public void run() {
+                            Picasso.with(getContext()).load(badge.getImageUrl()).into(badgeImage);
+                            badgeText.setText(badge.getText());
+                        }
+                    });
+
                 }
-            };
+            }).start();
         } else {
             Picasso.with(getContext()).load(badge.getImageUrl()).into(badgeImage);
             badgeText.setText(badge.getText());
         }
 
         if (badge.getAppId() != null) {
-            badgeLevel.setText("Lvl.: " + badge.getLevel());
+            badgeLevel.setText(getResources().getString(R.string.lvl, badge.getLevel()));
         } else {
             badgeLevel.setText(null);
         }
