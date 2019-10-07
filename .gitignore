@@ -11,6 +11,7 @@
 # Generated files
 bin/
 gen/
+app/release/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -36,3 +37,5 @@ obj/
 
 # Log Files
 *.log
+
+app/google-services.json
