@@ -57,7 +57,7 @@ before_deploy:
 
   # Verification
   - jarsigner -verify app/build/outputs/apk/release/app-release-unsigned.apk
-  - "${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk SteamBadger.apk"
+  - "${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/SteamBadger.apk"
   - jarsigner -verify app/build/outputs/bundle/release/app-release.aab
 
 deploy:
