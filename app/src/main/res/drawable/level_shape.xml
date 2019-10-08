@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <level-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:minLevel="0" android:maxLevel="1000" android:drawable="@drawable/level_circle" />
+    <item android:minLevel="0" android:maxLevel="99" android:drawable="@drawable/level_circle" />
+    <item android:minLevel="100" android:maxLevel="9999" android:drawable="@drawable/level_hexagon" />
 
 </level-list>
