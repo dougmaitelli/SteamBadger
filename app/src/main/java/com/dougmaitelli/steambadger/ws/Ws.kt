@@ -186,10 +186,10 @@ object Ws {
 
         val badgeContainer = doc.select(".badge_info")
 
-        val elementTitle = badgeContainer.select(".badge_info_title").get(0)
+        val elementTitle = badgeContainer.select(".badge_info_title")[0]
         badge.text = elementTitle.text()
 
-        val elementImage = badgeContainer.select(".badge_info_image img").get(0)
+        val elementImage = badgeContainer.select(".badge_info_image img")[0]
         badge.imageUrl = elementImage.attr("src")
     }
 

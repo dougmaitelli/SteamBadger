@@ -2,6 +2,7 @@ package com.dougmaitelli.steambadger.view
 
 import android.content.Context
 import android.os.Handler
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -45,7 +46,7 @@ class BadgeView : LinearLayout {
         badgeLevel = badgeView.findViewById(R.id.badge_level)
     }
 
-    fun refreshData() {
+    private fun refreshData() {
         if (badge == null) {
             return
         }

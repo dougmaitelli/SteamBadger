@@ -1,18 +1,25 @@
 package com.dougmaitelli.steambadger.view
 
 import android.content.Context
+import android.graphics.*
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.VectorDrawable
 import android.os.Handler
 import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.graphics.drawable.TintAwareDrawable
+import androidx.core.graphics.toColorLong
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 
 import com.squareup.picasso.Picasso
 import com.dougmaitelli.steambadger.R
 import com.dougmaitelli.steambadger.database.model.Player
 import com.dougmaitelli.steambadger.util.LevelColor
+import kotlin.math.absoluteValue
 
 class ProfileHeaderView : LinearLayout {
 
@@ -37,7 +44,6 @@ class ProfileHeaderView : LinearLayout {
     }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-
         this.build()
     }
 
@@ -48,13 +54,13 @@ class ProfileHeaderView : LinearLayout {
     }
 
     private fun build() {
-        val badgeView = inflate(context, R.layout.profileheader_view, this) as LinearLayout
+        val badgeView = inflate(context, R.layout.profileheader_view, this)
 
-        avatar = badgeView.findViewById(R.id.player_photo) as ImageView
-        name = badgeView.findViewById(R.id.player_name) as TextView
-        levelProgress = badgeView.findViewById(R.id.level_progress) as ProgressBar
-        playerExp = badgeView.findViewById(R.id.player_exp) as TextView
-        level = badgeView.findViewById(R.id.level) as TextView
+        avatar = badgeView.findViewById(R.id.player_photo)
+        name = badgeView.findViewById(R.id.player_name)
+        levelProgress = badgeView.findViewById(R.id.level_progress)
+        playerExp = badgeView.findViewById(R.id.player_exp)
+        level = badgeView.findViewById(R.id.level)
     }
 
     fun refreshData() {
@@ -81,7 +87,7 @@ class ProfileHeaderView : LinearLayout {
             playerExp!!.text = resources.getString(R.string.xp, player!!.playerXp)
             level!!.text = player!!.playerLevel.toString()
             level!!.background.level = player!!.playerLevel
-            (level!!.background.current as GradientDrawable).setColor(LevelColor.getLevelColor(player!!.playerLevel).color)
+            level!!.background.current.setColorFilter(LevelColor.getLevelColor(player!!.playerLevel).color, PorterDuff.Mode.MULTIPLY)
         } else {
             avatar!!.setImageBitmap(null)
             name!!.text = ""
