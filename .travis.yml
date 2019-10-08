@@ -49,20 +49,20 @@ before_script:
   - adb shell input keyevent 82 &
 
 before_deploy:
-  - cp $TRAVIS_BUILD_DIR/keystore.jks $HOME
-  - cd app/build/outputs/apk/release/
-  - ls -la
-  - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $HOME/keystore.jks -storepass $storepass -keypass $keypass app-release-unsigned.apk key0
+  - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $TRAVIS_BUILD_DIR/keystore.jks -storepass $storepass -keypass $keypass app/build/outputs/apk/release/app-release-unsigned.apk key0
+  - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $TRAVIS_BUILD_DIR/keystore.jks -storepass $storepass -keypass $keypass app/build/outputs/bundle/release/app-release.aab key0
 
   # Verification
-  - jarsigner -verify app-release-unsigned.apk
-  - "${ANDROID_HOME}/build-tools/27.0.0/zipalign -v 4 app-release-unsigned.apk SteamBadger.apk"
+  - jarsigner -verify app/build/outputs/apk/release/app-release-unsigned.apk
+  - "${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign -v 4 app-release-unsigned.apk SteamBadger.apk"
+  - jarsigner -verify app/build/outputs/bundle/release/app-release.aab
 
 deploy:
   provider: releases
   api_key: $GITPERM
   skip_cleanup: true
   file:
-    - "SteamBadger.apk"
+    - "app/build/outputs/apk/release/SteamBadger.apk"
+    - "app/build/outputs/bundle/release/app-release.aab"
   on:
     tags: true

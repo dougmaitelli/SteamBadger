@@ -117,6 +117,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toogleMenu() {
+        if (mDrawerToggle == null) {
+            return
+        }
+
         if (mDrawerLayout!!.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout!!.closeDrawer(GravityCompat.START)
         } else {
@@ -125,6 +129,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (mDrawerToggle == null) {
+            return
+        }
+
         if (mDrawerLayout!!.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout!!.closeDrawer(GravityCompat.START)
             return
