@@ -38,7 +38,8 @@ licenses:
   - google-gdk-license-.+
 
 before_install:
-  -  openssl aes-256-cbc -K $encrypted_bbd87bb538a0_key -iv $encrypted_bbd87bb538a0_iv -in keystore.jks.enc -out keystore.jks -d
+  - openssl aes-256-cbc -K $encrypted_bbd87bb538a0_key -iv $encrypted_bbd87bb538a0_iv -in keystore.jks.enc -out keystore.jks -d
+  - openssl aes-256-cbc -K $encrypted_bbd87bb538a0_key -iv $encrypted_bbd87bb538a0_iv -in google-services.json.enc -out app/google-services.json -d
 
 before_script:
   - echo no | android create avd --force -n test -t android-$EMULATOR_API --abi armeabi-v7a
