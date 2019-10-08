@@ -48,6 +48,9 @@ before_script:
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
 
+script:
+  - gradlew build bundle connectedCheck
+
 before_deploy:
   - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $TRAVIS_BUILD_DIR/keystore.jks -storepass $storepass -keypass $keypass app/build/outputs/apk/release/app-release-unsigned.apk key0
   - jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore $TRAVIS_BUILD_DIR/keystore.jks -storepass $storepass -keypass $keypass app/build/outputs/bundle/release/app-release.aab key0
