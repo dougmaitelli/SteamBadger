@@ -14,6 +14,7 @@ import android.view.MenuItem
 import com.j256.ormlite.dao.DaoManager
 import com.dougmaitelli.steambadger.activity.LoginActivity
 import com.dougmaitelli.steambadger.application.Config
+import com.dougmaitelli.steambadger.application.SteamBadgeR
 import com.dougmaitelli.steambadger.database.DatabaseHelper
 import com.dougmaitelli.steambadger.database.model.Player
 import com.dougmaitelli.steambadger.fragment.ProfileFragment
@@ -167,8 +168,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun logoff() {
+        val customUrl = Config.getInstance(this).customUrl
+
         Config.getInstance(this).setSteamId(null)
         Config.getInstance(this).setCustomUrl(null)
+
+        val bundle = Bundle()
+        bundle.putString(SteamBadgeR.Param.CUSTOM_URL, customUrl)
+        firebaseAnalytics.logEvent(SteamBadgeR.Event.LOGOUT, bundle)
+
         loginActivity()
     }
 

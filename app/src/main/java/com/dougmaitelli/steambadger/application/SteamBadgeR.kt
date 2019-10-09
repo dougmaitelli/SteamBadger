@@ -7,7 +7,6 @@ import com.squareup.picasso.Picasso
 
 class SteamBadgeR : Application() {
 
-
     override fun onCreate() {
         super.onCreate()
 
@@ -24,6 +23,24 @@ class SteamBadgeR : Application() {
     companion object {
 
         lateinit var instance: SteamBadgeR
+    }
+
+    class Event private constructor() {
+
+        companion object {
+            val LOGIN = "login"
+            val LOGOUT = "logout"
+        }
+
+    }
+
+    class Param private constructor() {
+
+        companion object {
+            val CUSTOM_URL = "customUrl"
+            val STEAM_ID = "steamId"
+        }
+
     }
 
 }

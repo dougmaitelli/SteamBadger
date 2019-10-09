@@ -14,14 +14,20 @@ import android.widget.Toast
 import com.dougmaitelli.steambadger.MainActivity
 import com.dougmaitelli.steambadger.R
 import com.dougmaitelli.steambadger.application.Config
+import com.dougmaitelli.steambadger.application.SteamBadgeR
 import com.dougmaitelli.steambadger.util.LoaderTask
 import com.dougmaitelli.steambadger.ws.Ws
+import com.google.firebase.analytics.FirebaseAnalytics
 
 class LoginActivity : Activity() {
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
         val customUrlEdit = findViewById<EditText>(R.id.custom_url)
         val loginButton = findViewById<Button>(R.id.login_button)
@@ -42,7 +48,7 @@ class LoginActivity : Activity() {
         }
     }
 
-    private class LoginTask constructor(ctx: LoginActivity, internal var customUrl: String) : LoaderTask<LoginActivity>(ctx) {
+    private inner class LoginTask constructor(ctx: LoginActivity, internal var customUrl: String) : LoaderTask<LoginActivity>(ctx) {
 
         private var hasException: Exception? = null
 
@@ -63,6 +69,11 @@ class LoginActivity : Activity() {
                 Toast.makeText(context, R.string.login_error, Toast.LENGTH_SHORT).show()
                 return
             }
+
+            val bundle = Bundle()
+            bundle.putString(SteamBadgeR.Param.CUSTOM_URL,  Config.getInstance(context).customUrl)
+            bundle.putString(SteamBadgeR.Param.STEAM_ID, Config.getInstance(context).steamId)
+            firebaseAnalytics.logEvent(SteamBadgeR.Event.LOGIN, bundle)
 
             val activity = Intent(context, MainActivity::class.java)
             context.startActivity(activity)

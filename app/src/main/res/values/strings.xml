@@ -5,6 +5,8 @@
     <string name="menu">Menu</string>
     <string name="action_settings">Settings</string>
 
+    <string name="text_login_description">Please enter your profile Custom URL</string>
+    <string name="text_custom_url_base">http://steamcommunity.com/id/</string>
     <string name="hint_custom_url">Custom Url</string>
     <string name="action_login">Login</string>
     <string name="login_error">Error Requesting Data</string>

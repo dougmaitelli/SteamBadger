@@ -28,6 +28,31 @@
 
     </androidx.cardview.widget.CardView>
 
+    <TextView
+        android:id="@+id/login_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/text_login_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
+
+    <TextView
+        android:id="@+id/custom_url_base"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="45dp"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="@string/text_custom_url_base"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_description" />
+
     <EditText
         android:id="@+id/custom_url"
         android:inputType="text"
@@ -35,14 +60,14 @@
         android:imeOptions="actionDone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
-        android:layout_marginStart="50dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="30dp"
         android:maxLines="1"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo" />
+        app:layout_constraintStart_toEndOf="@+id/custom_url_base"
+        app:layout_constraintTop_toBottomOf="@+id/login_description" />
 
     <Button
         android:id="@+id/login_button"
@@ -50,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="50dp"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:text="@string/action_login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
