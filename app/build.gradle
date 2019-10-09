@@ -5,6 +5,15 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: 'io.fabric'
 
+ext {
+    git = org.ajoberstar.grgit.Grgit.open()
+    gitVersionCode = git.tag.list().size()
+    gitVersionName = "${git.describe()}".substring(1)
+}
+
+print "Project Version: " + gitVersionName
+print "Project Version Code: " + gitVersionCode
+
 android {
     compileSdkVersion 29
     buildToolsVersion '29.0.2'
@@ -13,8 +22,8 @@ android {
         applicationId "com.dougmaitelli.steambadger"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 4
-        versionName "1.4.0"
+        versionCode gitVersionCode
+        versionName gitVersionName.substring(1)
     }
     buildTypes {
         release {
