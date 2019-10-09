@@ -2,7 +2,7 @@ package com.dougmaitelli.steambadger.util
 
 import android.graphics.Color
 
-enum class LevelColor private constructor(colorStr: String) {
+enum class LevelColor constructor(colorStr: String) {
 
     LVL_0("#FF9B9B9B"),
     LVL_10("#FFC02942"),

@@ -18,19 +18,25 @@ import com.dougmaitelli.steambadger.database.DatabaseHelper
 import com.dougmaitelli.steambadger.database.model.Player
 import com.dougmaitelli.steambadger.fragment.ProfileFragment
 import com.dougmaitelli.steambadger.fragment.menu.MenuFragment
+import com.google.firebase.analytics.FirebaseAnalytics
 
 class MainActivity : AppCompatActivity() {
 
     var player: Player? = null
 
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
     private var mDrawerLayout: DrawerLayout? = null
     private var mDrawerToggle: ActionBarDrawerToggle? = null
 
+    private var mMenu: Fragment? = null
     private var mContent: Fragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
         if (Config.getInstance(this).steamId.isNullOrEmpty()) {
             val intent = Intent(this, LoginActivity::class.java)
@@ -51,10 +57,15 @@ class MainActivity : AppCompatActivity() {
         mDrawerLayout!!.addDrawerListener(mDrawerToggle!!)
 
         if (savedInstanceState != null) {
-            mContent = getSupportFragmentManager().getFragment(savedInstanceState, "mContent")
+            mMenu = supportFragmentManager.getFragment(savedInstanceState, "mMenu")
+            mContent = supportFragmentManager.getFragment(savedInstanceState, "mContent")
         }
 
         getLoggedUser()
+
+        if (mMenu == null) {
+            mMenu = MenuFragment()
+        }
 
         if (mContent == null) {
             val bundle = Bundle()
@@ -70,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         // Menu
         supportFragmentManager
                 .beginTransaction()
-                .add(R.id.left_drawer, MenuFragment())
+                .replace(R.id.left_drawer, mMenu!!)
                 .commit()
 
         // Content
@@ -106,6 +117,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toogleMenu() {
+        if (mDrawerToggle == null) {
+            return
+        }
+
         if (mDrawerLayout!!.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout!!.closeDrawer(GravityCompat.START)
         } else {
@@ -114,6 +129,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if (mDrawerToggle == null) {
+            return
+        }
+
         if (mDrawerLayout!!.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout!!.closeDrawer(GravityCompat.START)
             return
@@ -136,9 +155,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if (mContent != null) {
-            super.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
 
+        if (mMenu != null) {
+            supportFragmentManager.putFragment(outState, "mMenu", supportFragmentManager.findFragmentById(R.id.left_drawer)!!)
+        }
+
+        if (mContent != null) {
             supportFragmentManager.putFragment(outState, "mContent", supportFragmentManager.findFragmentById(R.id.content_frame)!!)
         }
     }

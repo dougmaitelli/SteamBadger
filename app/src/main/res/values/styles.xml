@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat">
@@ -8,6 +8,7 @@
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:color">@color/white</item>
         <item name="android:windowBackground">@color/lightGrey</item>
+        <item name="android:navigationBarColor" tools:targetApi="21">@color/appGreyDark</item>
 
         <item name="drawerArrowStyle">@style/Widget.Styled.DrawerArrowToggle</item>
     </style>

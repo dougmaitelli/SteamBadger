@@ -44,6 +44,8 @@ class LoginActivity : Activity() {
 
     private class LoginTask constructor(ctx: LoginActivity, internal var customUrl: String) : LoaderTask<LoginActivity>(ctx) {
 
+        private var hasException: Exception? = null
+
         override fun process() {
             try {
                 val steamId = Ws.getSteamId(customUrl)
@@ -51,12 +53,17 @@ class LoginActivity : Activity() {
                 Config.getInstance(context).setCustomUrl(customUrl)
                 Config.getInstance(context).setSteamId(steamId)
             } catch (ex: Exception) {
-                Toast.makeText(context, R.string.login_error, Toast.LENGTH_SHORT).show()
+                hasException = ex
             }
 
         }
 
         override fun onComplete() {
+            if (hasException != null) {
+                Toast.makeText(context, R.string.login_error, Toast.LENGTH_SHORT).show()
+                return
+            }
+
             val activity = Intent(context, MainActivity::class.java)
             context.startActivity(activity)
         }
