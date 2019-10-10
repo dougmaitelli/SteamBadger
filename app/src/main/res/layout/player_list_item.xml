@@ -16,6 +16,7 @@
             android:id="@+id/player_avatar"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:contentDescription="@string/cd_player_photo"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

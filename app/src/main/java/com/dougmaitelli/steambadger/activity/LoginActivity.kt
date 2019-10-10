@@ -3,12 +3,9 @@ package com.dougmaitelli.steambadger.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 
 import com.dougmaitelli.steambadger.MainActivity
@@ -48,7 +45,7 @@ class LoginActivity : Activity() {
         }
     }
 
-    private inner class LoginTask constructor(ctx: LoginActivity, internal var customUrl: String) : LoaderTask<LoginActivity>(ctx) {
+    private class LoginTask constructor(ctx: LoginActivity, internal var customUrl: String) : LoaderTask<LoginActivity>(ctx) {
 
         private var hasException: Exception? = null
 
@@ -73,7 +70,7 @@ class LoginActivity : Activity() {
             val bundle = Bundle()
             bundle.putString(SteamBadgeR.Param.CUSTOM_URL,  Config.getInstance(context).customUrl)
             bundle.putString(SteamBadgeR.Param.STEAM_ID, Config.getInstance(context).steamId)
-            firebaseAnalytics.logEvent(SteamBadgeR.Event.LOGIN, bundle)
+            context.firebaseAnalytics.logEvent(SteamBadgeR.Event.LOGIN, bundle)
 
             val activity = Intent(context, MainActivity::class.java)
             context.startActivity(activity)

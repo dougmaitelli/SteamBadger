@@ -10,12 +10,10 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridView
 
 import com.dougmaitelli.steambadger.MainActivity
 import com.dougmaitelli.steambadger.R
 import com.dougmaitelli.steambadger.database.model.Player
-import com.dougmaitelli.steambadger.database.model.PlayerBadge
 import com.dougmaitelli.steambadger.util.LoaderTask
 import com.dougmaitelli.steambadger.util.Util
 import com.dougmaitelli.steambadger.view.ProfileHeaderView
@@ -70,7 +68,7 @@ class BadgesFragment : Fragment() {
         return true
     }
 
-    private inner class FragmentTask constructor(ctx: MainActivity, private val player: Player) : LoaderTask<MainActivity>(ctx) {
+    private class FragmentTask constructor(ctx: MainActivity, private val fragment: BadgesFragment, private val player: Player) : LoaderTask<MainActivity>(ctx) {
 
         override fun process() {
             try {
@@ -86,12 +84,12 @@ class BadgesFragment : Fragment() {
         }
 
         override fun onComplete() {
-            this@BadgesFragment.showPlayerBadges()
+            fragment.showPlayerBadges()
         }
     }
 
     private fun loadPlayerBadges() {
-        FragmentTask(activity as MainActivity, player!!)
+        FragmentTask(activity as MainActivity, this, player!!)
     }
 
     private fun showPlayerBadges() {

@@ -2,7 +2,7 @@ package com.dougmaitelli.steambadger.view
 
 import android.content.Context
 import android.os.Handler
-import android.view.View
+import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -17,14 +17,20 @@ import com.dougmaitelli.steambadger.ws.Ws
 
 class BadgeView : LinearLayout {
 
-    private val player: Player
+    private var player: Player? = null
     private var badge: Badge? = null
 
     private var badgeImage: ImageView? = null
     private var badgeText: TextView? = null
     private var badgeLevel: TextView? = null
 
-    constructor(context: Context, player: Player, badge: Badge?) : super(context) {
+    constructor(context: Context) : super(context)
+
+    constructor(context: Context, attributeSet: AttributeSet) : super(context, attributeSet)
+
+    constructor(context: Context, attributeSet: AttributeSet, defStyle: Int) : super(context, attributeSet, defStyle)
+
+    constructor(context: Context, player: Player, badge: Badge?) : this(context) {
         this.player = player
         this.badge = badge
 
@@ -61,7 +67,7 @@ class BadgeView : LinearLayout {
                 try {
                     val badgeDao = DaoManager.createDao(DatabaseHelper.connectionSource, Badge::class.java)
 
-                    Ws.loadBadgeData(player, badge!!)
+                    Ws.loadBadgeData(player!!, badge!!)
                     badgeDao.update(badge)
                 } catch (ex: Exception) {
                     ex.printStackTrace()

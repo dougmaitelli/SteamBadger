@@ -1,28 +1,22 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context=".fragment.BadgesFragment">
 
-    <RelativeLayout
+    <com.dougmaitelli.steambadger.view.AutofitRecyclerView
+        android:id="@+id/badges_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:columnWidth="90dp"
+        android:padding="10dp"
+        android:clipToPadding="false"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="100dp"/>
 
-        <com.dougmaitelli.steambadger.view.AutofitRecyclerView
-            android:id="@+id/badges_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:columnWidth="90dp"
-            android:padding="10dp"
-            android:clipToPadding="false"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="100dp"/>
+    <com.dougmaitelli.steambadger.view.ProfileHeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"/>
 
-        <com.dougmaitelli.steambadger.view.ProfileHeaderView
-            android:id="@+id/header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"/>
-
-    </RelativeLayout>
-
-</FrameLayout>
+</RelativeLayout>

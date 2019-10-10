@@ -59,7 +59,7 @@ class ProfileFragment : Fragment() {
         fragmentLoaded = true
     }
 
-    private inner class FragmentTask constructor(ctx: MainActivity, private val player: Player) : LoaderTask<MainActivity>(ctx) {
+    private class FragmentTask constructor(ctx: MainActivity, private val fragment: ProfileFragment, private val player: Player) : LoaderTask<MainActivity>(ctx) {
 
         override fun process() {
             try {
@@ -75,12 +75,12 @@ class ProfileFragment : Fragment() {
         }
 
         override fun onComplete() {
-            this@ProfileFragment.showPlayerData(player)
+            fragment.showPlayerData(player)
         }
     }
 
     private fun loadPlayerData() {
-        FragmentTask(activity as MainActivity, player!!)
+        FragmentTask(activity as MainActivity, this, player!!)
     }
 
     private fun showPlayerData(player: Player) {

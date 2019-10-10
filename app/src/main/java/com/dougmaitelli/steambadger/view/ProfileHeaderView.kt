@@ -1,25 +1,21 @@
 package com.dougmaitelli.steambadger.view
 
 import android.content.Context
-import android.graphics.*
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.VectorDrawable
 import android.os.Handler
 import android.util.AttributeSet
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.graphics.drawable.TintAwareDrawable
-import androidx.core.graphics.toColorLong
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 
 import com.squareup.picasso.Picasso
 import com.dougmaitelli.steambadger.R
 import com.dougmaitelli.steambadger.database.model.Player
 import com.dougmaitelli.steambadger.util.LevelColor
-import kotlin.math.absoluteValue
+import android.graphics.PorterDuff
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.os.Build
 
 class ProfileHeaderView : LinearLayout {
 
@@ -32,7 +28,10 @@ class ProfileHeaderView : LinearLayout {
     private var level: TextView? = null
 
     constructor(context: Context) : super(context) {
+        this.build()
+    }
 
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         this.build()
     }
 
@@ -41,10 +40,6 @@ class ProfileHeaderView : LinearLayout {
 
         this.build()
         this.refreshData()
-    }
-
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        this.build()
     }
 
     fun setPlayer(player: Player) {
@@ -87,7 +82,12 @@ class ProfileHeaderView : LinearLayout {
             playerExp!!.text = resources.getString(R.string.xp, player!!.playerXp)
             level!!.text = player!!.playerLevel.toString()
             level!!.background.level = player!!.playerLevel
-            level!!.background.current.setColorFilter(LevelColor.getLevelColor(player!!.playerLevel).color, PorterDuff.Mode.MULTIPLY)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                level!!.background.current.colorFilter = BlendModeColorFilter(LevelColor.getLevelColor(player!!.playerLevel).color, BlendMode.MULTIPLY)
+            } else {
+                @Suppress("DEPRECATION")
+                level!!.background.current.setColorFilter(LevelColor.getLevelColor(player!!.playerLevel).color, PorterDuff.Mode.MULTIPLY)
+            }
         } else {
             avatar!!.setImageBitmap(null)
             name!!.text = ""

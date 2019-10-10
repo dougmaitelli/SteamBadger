@@ -74,7 +74,7 @@ class FriendsFragment : Fragment() {
         return true
     }
 
-    private inner class FragmentTask constructor(ctx: MainActivity, private val player: Player) : LoaderTask<MainActivity>(ctx) {
+    private class FragmentTask constructor(ctx: MainActivity, private val fragment: FriendsFragment, private val player: Player) : LoaderTask<MainActivity>(ctx) {
         private var friends: List<Player>? = null
 
         override fun process() {
@@ -87,12 +87,12 @@ class FriendsFragment : Fragment() {
         }
 
         override fun onComplete() {
-            this@FriendsFragment.showPlayerFriends(friends)
+            fragment.showPlayerFriends(friends)
         }
     }
 
     private fun loadPlayerFriends() {
-        FragmentTask(activity as MainActivity, player!!)
+        FragmentTask(activity as MainActivity, this, player!!)
     }
 
     private fun showPlayerFriends(friends: List<Player>?) {
