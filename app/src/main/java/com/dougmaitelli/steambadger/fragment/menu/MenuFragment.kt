@@ -17,7 +17,7 @@ class MenuFragment : Fragment() {
     private var adp: MenuAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.slide_menu, null)
+        return inflater.inflate(R.layout.slide_menu, container)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

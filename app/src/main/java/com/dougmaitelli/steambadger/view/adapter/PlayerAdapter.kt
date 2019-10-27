@@ -31,7 +31,7 @@ class PlayerAdapter(private val context: Context) : RecyclerView.Adapter<PlayerA
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val v = LayoutInflater.from(parent.getContext()).inflate(R.layout.player_list_item, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.player_list_item, parent, false)
         return ViewHolder(v)
     }
 

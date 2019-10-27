@@ -3,7 +3,6 @@
     android:id="@+id/header"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:layout_margin="10dp"
     app:cardBackgroundColor="@color/appGreyDark"
     app:cardCornerRadius="2dp"
     app:cardElevation="10dp">

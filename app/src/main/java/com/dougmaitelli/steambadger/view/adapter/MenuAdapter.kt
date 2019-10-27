@@ -34,10 +34,6 @@ class MenuAdapter(private val context: Context) : BaseAdapter() {
         return position.toLong()
     }
 
-    fun areAllItemsSelectable(): Boolean {
-        return false
-    }
-
     override fun isEnabled(position: Int): Boolean {
         return true
     }

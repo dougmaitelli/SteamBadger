@@ -44,7 +44,7 @@ class BadgeView : LinearLayout {
         this.refreshData()
     }
 
-    fun build() {
+    private fun build() {
         val badgeView = inflate(context, R.layout.badge_view, this) as LinearLayout
 
         badgeImage = badgeView.findViewById(R.id.badge_image)

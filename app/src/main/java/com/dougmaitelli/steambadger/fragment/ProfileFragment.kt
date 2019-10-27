@@ -69,7 +69,7 @@ class ProfileFragment : Fragment() {
                     Ws.getPlayerData(player)
                 }
             } catch (ex: Exception) {
-                System.out.println(ex)
+                println(ex)
             }
 
         }

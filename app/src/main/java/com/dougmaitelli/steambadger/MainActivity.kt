@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        mDrawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        mDrawerLayout = findViewById(R.id.drawer_layout)
 
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setHomeButtonEnabled(true)
@@ -219,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 
             if (playerResult.isEmpty()) {
                 player = Player()
-                player!!.steamId = steamId;
+                player!!.steamId = steamId
                 playerDao.create(player)
 
                 playerDao.refresh(player)

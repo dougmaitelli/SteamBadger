@@ -11,13 +11,12 @@ import com.dougmaitelli.steambadger.database.model.PlayerBadge
 import org.json.JSONObject
 import org.jsoup.Jsoup
 
-import java.io.IOException
 import java.util.*
 
 object Ws {
 
-    private val API_KEY = "27D8D587593B6BA04261A296F62DADAB"
-    private val API_URL = "https://api.steampowered.com/"
+    private const val API_KEY = "27D8D587593B6BA04261A296F62DADAB"
+    private const val API_URL = "https://api.steampowered.com/"
 
     fun getSteamId(customUrl: String): String {
         val values = HashMap<String, String>()
@@ -53,7 +52,7 @@ object Ws {
         }
 
         val values = HashMap<String, String>()
-        values.put("steamids", sb.toString())
+        values["steamids"] = sb.toString()
 
         val `object` = sendRequest("ISteamUser/GetPlayerSummaries/v0002/", values).getJSONObject("response")
 
@@ -67,11 +66,10 @@ object Ws {
             player!!.name = playerObject.getString("personaname")
             player.profileUrl = playerObject.getString("profileurl")
 
-            val avatarAttr: String
-            when (avatarQuality) {
-                Ws.AvatarQuality.LOW -> avatarAttr = "avatar"
-                Ws.AvatarQuality.MEDIUM -> avatarAttr = "avatarmedium"
-                Ws.AvatarQuality.HIGH -> avatarAttr = "avatarfull"
+            val avatarAttr = when (avatarQuality) {
+                AvatarQuality.LOW -> "avatar"
+                AvatarQuality.MEDIUM -> "avatarmedium"
+                AvatarQuality.HIGH -> "avatarfull"
             }
 
             player.avatarUrl = playerObject.getString(avatarAttr)
@@ -85,7 +83,7 @@ object Ws {
 
     fun getPlayerFriends(player: Player): List<Player> {
         val values = HashMap<String, String>()
-        values.put("steamid", player.steamId!!)
+        values["steamid"] = player.steamId!!
 
         val `object` = sendRequest("ISteamUser/GetFriendList/v1/", values).getJSONObject("friendslist")
 
@@ -109,7 +107,7 @@ object Ws {
         val badgeDao = DaoManager.createDao(DatabaseHelper.connectionSource, Badge::class.java)
 
         val values = HashMap<String, String>()
-        values.put("steamid", player.steamId!!)
+        values["steamid"] = player.steamId!!
 
         val jsonObject = sendRequest("IPlayerService/GetBadges/v1/", values).getJSONObject("response")
 
@@ -142,7 +140,7 @@ object Ws {
             val badgesResult = badgeDao.queryForMatchingArgs(badge)
 
             if (badgesResult.size > 0) {
-                badge = badgesResult.get(0)
+                badge = badgesResult[0]
             } else {
                 badgeDao.create(badge)
             }
