@@ -5,14 +5,11 @@ import android.os.AsyncTask
 import androidx.appcompat.app.AlertDialog
 import com.dougmaitelli.steambadger.R
 
-abstract class LoaderTask<C : Activity> constructor(context: C, showProgress: Boolean = true) : AsyncTask<C, Any, Any>() {
+abstract class LoaderTask<C : Activity> constructor(protected val context: C, showProgress: Boolean = true) : AsyncTask<C, Any, Any>() {
 
-    protected val context: C
     private var dialog: AlertDialog? = null
 
     init {
-        this.context = context
-
         if (showProgress) {
             val builder = AlertDialog.Builder(context)
             builder.setView(R.layout.progress)

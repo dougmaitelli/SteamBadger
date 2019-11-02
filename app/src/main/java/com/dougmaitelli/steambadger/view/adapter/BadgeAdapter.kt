@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 
 import com.dougmaitelli.steambadger.database.model.Badge
 import com.dougmaitelli.steambadger.database.model.Player
@@ -65,7 +64,7 @@ class BadgeAdapter(private val context: Context, private val player: Player) : R
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        var badgeView: BadgeView = itemView as BadgeView
+        private var badgeView: BadgeView = itemView as BadgeView
 
         fun bind(item: Badge, listener: OnItemClickListener?) {
             badgeView.setBadge(item)

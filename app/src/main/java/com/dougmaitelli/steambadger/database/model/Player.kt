@@ -4,34 +4,35 @@ import com.j256.ormlite.dao.ForeignCollection
 import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.field.ForeignCollectionField
 import com.j256.ormlite.table.DatabaseTable
-
 import java.io.Serializable
+
 import java.util.ArrayList
 
 @DatabaseTable
-class Player : Comparable<Player>, Serializable {
+data class Player(
 
     @DatabaseField(generatedId = true)
-    var id: Long? = null
+    var id: Long? = null,
     @DatabaseField(canBeNull = false)
-    var steamId: String? = null
+    var steamId: String? = null,
     @DatabaseField
-    var name: String? = null
+    var name: String? = null,
     @DatabaseField
-    var profileUrl: String? = null
+    var profileUrl: String? = null,
     @DatabaseField
-    var avatarUrl: String? = null
+    var avatarUrl: String? = null,
     @DatabaseField(canBeNull = false)
-    var playerXp: Long = 0
+    var playerXp: Long = 0,
     @DatabaseField(canBeNull = false)
-    var playerLevel: Int = 0
+    var playerLevel: Int = 0,
     @DatabaseField(canBeNull = false)
-    var playerXpNeededToLevelUp: Long = 0
+    var playerXpNeededToLevelUp: Long = 0,
     @DatabaseField(canBeNull = false)
     var playerXpNeededCurrentLevel: Long = 0
+) : Comparable<Player>, Serializable {
 
     @DatabaseField
-    var isBadgesLoaded = false
+    var isBadgesLoaded: Boolean = false
 
     @ForeignCollectionField(eager = false)
     var playerBadgesCollection: ForeignCollection<PlayerBadge>? = null

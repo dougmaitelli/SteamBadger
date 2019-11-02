@@ -21,15 +21,14 @@ class SteamBadgeR : Application() {
     }
 
     companion object {
-
         lateinit var instance: SteamBadgeR
     }
 
     class Event private constructor() {
 
         companion object {
-            val LOGIN = "login"
-            val LOGOUT = "logout"
+            const val LOGIN = "login"
+            const val LOGOUT = "logout"
         }
 
     }
@@ -37,8 +36,8 @@ class SteamBadgeR : Application() {
     class Param private constructor() {
 
         companion object {
-            val CUSTOM_URL = "customUrl"
-            val STEAM_ID = "steamId"
+            const val CUSTOM_URL = "customUrl"
+            const val STEAM_ID = "steamId"
         }
 
     }

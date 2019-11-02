@@ -14,6 +14,8 @@ import android.view.MenuItem
 import com.j256.ormlite.dao.DaoManager
 import com.dougmaitelli.steambadger.activity.LoginActivity
 import com.dougmaitelli.steambadger.application.Config
+import com.dougmaitelli.steambadger.application.Config.get
+import com.dougmaitelli.steambadger.application.Config.set
 import com.dougmaitelli.steambadger.application.SteamBadgeR
 import com.dougmaitelli.steambadger.database.DatabaseHelper
 import com.dougmaitelli.steambadger.database.model.Player
@@ -39,7 +41,9 @@ class MainActivity : AppCompatActivity() {
 
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
 
-        if (Config.getInstance(this).steamId.isNullOrEmpty()) {
+        val prefs = Config.defaultPrefs(this)
+
+        if (prefs[Config.SharedPrefs.STEAMID, ""].isNullOrEmpty()) {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             return
@@ -110,14 +114,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> this.toogleMenu()
+            android.R.id.home -> this.toggleMenu()
             else -> return super.onOptionsItemSelected(item)
         }
 
         return true
     }
 
-    private fun toogleMenu() {
+    private fun toggleMenu() {
         if (mDrawerToggle == null) {
             return
         }
@@ -168,10 +172,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun logoff() {
-        val customUrl = Config.getInstance(this).customUrl
+        val prefs = Config.defaultPrefs(this)
 
-        Config.getInstance(this).setSteamId(null)
-        Config.getInstance(this).setCustomUrl(null)
+        val customUrl: String? = prefs[Config.SharedPrefs.CUSTOMURL]
+
+        prefs[Config.SharedPrefs.STEAMID] = null
+        prefs[Config.SharedPrefs.CUSTOMURL] = null
 
         val bundle = Bundle()
         bundle.putString(SteamBadgeR.Param.CUSTOM_URL, customUrl)
@@ -212,7 +218,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun getLoggedUser() {
         try {
-            val steamId = Config.getInstance(this).steamId
+            val prefs = Config.defaultPrefs(this)
+
+            val steamId: String? = prefs[Config.SharedPrefs.STEAMID]
 
             val playerDao = DaoManager.createDao(DatabaseHelper.connectionSource, Player::class.java)
             val playerResult = playerDao.queryForEq("steamId", steamId)

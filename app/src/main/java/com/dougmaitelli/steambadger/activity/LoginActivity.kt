@@ -11,6 +11,8 @@ import android.widget.Toast
 import com.dougmaitelli.steambadger.MainActivity
 import com.dougmaitelli.steambadger.R
 import com.dougmaitelli.steambadger.application.Config
+import com.dougmaitelli.steambadger.application.Config.get
+import com.dougmaitelli.steambadger.application.Config.set
 import com.dougmaitelli.steambadger.application.SteamBadgeR
 import com.dougmaitelli.steambadger.util.LoaderTask
 import com.dougmaitelli.steambadger.ws.Ws
@@ -53,8 +55,10 @@ class LoginActivity : Activity() {
             try {
                 val steamId = Ws.getSteamId(customUrl)
 
-                Config.getInstance(context).setCustomUrl(customUrl)
-                Config.getInstance(context).setSteamId(steamId)
+                val prefs = Config.defaultPrefs(context)
+
+                prefs[Config.SharedPrefs.CUSTOMURL] = customUrl
+                prefs[Config.SharedPrefs.STEAMID] = steamId
             } catch (ex: Exception) {
                 hasException = ex
             }
@@ -67,9 +71,11 @@ class LoginActivity : Activity() {
                 return
             }
 
+            val prefs = Config.defaultPrefs(context)
+
             val bundle = Bundle()
-            bundle.putString(SteamBadgeR.Param.CUSTOM_URL,  Config.getInstance(context).customUrl)
-            bundle.putString(SteamBadgeR.Param.STEAM_ID, Config.getInstance(context).steamId)
+            bundle.putString(SteamBadgeR.Param.CUSTOM_URL, prefs[Config.SharedPrefs.CUSTOMURL])
+            bundle.putString(SteamBadgeR.Param.STEAM_ID, prefs[Config.SharedPrefs.STEAMID])
             context.firebaseAnalytics.logEvent(SteamBadgeR.Event.LOGIN, bundle)
 
             val activity = Intent(context, MainActivity::class.java)
