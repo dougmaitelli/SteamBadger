@@ -1,11 +1,11 @@
 package com.dougmaitelli.steambadger.application
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 
 import com.squareup.picasso.OkHttpDownloader
 import com.squareup.picasso.Picasso
 
-class SteamBadgeR : Application() {
+class SteamBadgeR : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
