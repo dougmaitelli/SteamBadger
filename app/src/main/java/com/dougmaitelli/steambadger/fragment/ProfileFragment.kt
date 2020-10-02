@@ -30,15 +30,15 @@ class ProfileFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         if (!fragmentLoaded) {
-            player = arguments!!.getSerializable("player") as Player?
+            player = requireArguments().getSerializable("player") as Player?
 
             loadPlayerData()
         }
 
-        header = activity!!.findViewById(R.id.header) as ProfileHeaderView
+        header = requireActivity().findViewById(R.id.header) as ProfileHeaderView
         header!!.setPlayer(player!!)
 
-        val badgesButton = activity!!.findViewById(R.id.badges_button) as Button
+        val badgesButton = requireActivity().findViewById(R.id.badges_button) as Button
         badgesButton.setOnClickListener {
             val bundle = Bundle()
             bundle.putSerializable("player", player)
@@ -47,7 +47,7 @@ class ProfileFragment : Fragment() {
             (activity as MainActivity).switchContent(fragment)
         }
 
-        val friendsButton = activity!!.findViewById(R.id.friends_button) as Button
+        val friendsButton = requireActivity().findViewById(R.id.friends_button) as Button
         friendsButton.setOnClickListener {
             val bundle = Bundle()
             bundle.putSerializable("player", player)

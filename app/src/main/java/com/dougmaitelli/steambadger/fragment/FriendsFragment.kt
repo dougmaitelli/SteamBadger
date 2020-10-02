@@ -36,9 +36,9 @@ class FriendsFragment : Fragment() {
         setHasOptionsMenu(true)
 
         if (!fragmentLoaded) {
-            player = arguments!!.getSerializable("player") as Player
+            player = requireArguments().getSerializable("player") as Player
 
-            adp = PlayerAdapter(context!!)
+            adp = PlayerAdapter(requireContext())
             adp!!.setOnItemClickListener(object : PlayerAdapter.OnItemClickListener{
                 override fun onItemClick(item: Player) {
                     val bundle = Bundle()
@@ -52,7 +52,7 @@ class FriendsFragment : Fragment() {
             loadPlayerFriends()
         }
 
-        val resultList = activity!!.findViewById(R.id.list_friends) as RecyclerView
+        val resultList = requireActivity().findViewById(R.id.list_friends) as RecyclerView
         resultList.adapter = adp
         resultList.layoutManager = LinearLayoutManager(context)
         resultList.itemAnimator = DefaultItemAnimator()

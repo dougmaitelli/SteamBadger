@@ -36,14 +36,14 @@ class BadgesFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        player = arguments!!.getSerializable("player") as Player
+        player = requireArguments().getSerializable("player") as Player
 
-        header = activity!!.findViewById(R.id.header) as ProfileHeaderView
+        header = requireActivity().findViewById(R.id.header) as ProfileHeaderView
         header!!.setPlayer(player!!)
 
-        adp = BadgeAdapter(activity!!, player!!)
+        adp = BadgeAdapter(requireActivity(), player!!)
 
-        val badgesLayout = activity!!.findViewById(R.id.badges_layout) as RecyclerView
+        val badgesLayout = requireActivity().findViewById(R.id.badges_layout) as RecyclerView
         badgesLayout.adapter = adp
         badgesLayout.itemAnimator = DefaultItemAnimator()
 
